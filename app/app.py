@@ -1,13 +1,15 @@
 import reflex as rx
 from app.states.ticket_state import TicketState, Ticket
+from app.users_page import users_page_content
+from app.computers_page import computers_page_content
 
 
-def sidebar_item(text: str, icon: str) -> rx.Component:
+def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
     return rx.el.div(
         rx.el.a(
             rx.icon(icon, class_name="w-5 h-5"),
             rx.el.span(text, class_name="font-medium"),
-            href="#",
+            href=href,
             class_name="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900",
         ),
         class_name="w-full",
@@ -20,19 +22,19 @@ def sidebar() -> rx.Component:
             rx.el.a(
                 rx.icon("activity", class_name="h-6 w-6 text-[#C00264]"),
                 rx.el.span("IT Helpdesk", class_name="sr-only"),
-                href="#",
+                href="/",
                 class_name="flex items-center gap-2 font-semibold",
             ),
             class_name="flex h-[60px] items-center border-b px-6",
         ),
         rx.el.div(
             rx.el.nav(
-                sidebar_item("Dashboard", "home"),
-                sidebar_item("Users", "users"),
-                sidebar_item("Computers", "laptop"),
-                sidebar_item("RA", "file-text"),
-                sidebar_item("Services", "settings"),
-                sidebar_item("Ticket", "ticket"),
+                sidebar_item("Dashboard", "home", "/"),
+                sidebar_item("Users", "users", "/users"),
+                sidebar_item("Computers", "laptop", "/computers"),
+                sidebar_item("RA", "file-text", "#"),
+                sidebar_item("Services", "settings", "#"),
+                sidebar_item("Ticket", "ticket", "#"),
                 class_name="grid items-start px-4 text-sm font-medium",
             ),
             class_name="flex-1 overflow-auto py-2",
@@ -275,6 +277,22 @@ def index() -> rx.Component:
     )
 
 
+def users_page() -> rx.Component:
+    return rx.el.div(
+        sidebar(),
+        users_page_content(),
+        class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3]",
+    )
+
+
+def computers_page() -> rx.Component:
+    return rx.el.div(
+        sidebar(),
+        computers_page_content(),
+        class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3]",
+    )
+
+
 app = rx.App(
     theme=rx.theme(appearance="light"),
     head_components=[
@@ -286,4 +304,6 @@ app = rx.App(
         ),
     ],
 )
-app.add_page(index)
+app.add_page(index, route="/")
+app.add_page(users_page, route="/users")
+app.add_page(computers_page, route="/computers")
