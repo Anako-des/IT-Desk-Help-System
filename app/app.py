@@ -1,9 +1,12 @@
 import reflex as rx
 from app.states.ticket_state import TicketState, Ticket
+from app.states.auth_state import AuthState
 from app.users_page import users_page_content
 from app.computers_page import computers_page_content
 from app.ra_page import ra_page_content
 from app.services_page import services_page_content
+from app.login_page import login_page
+from app.user_dashboard import user_dashboard
 
 
 def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
@@ -21,13 +24,21 @@ def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
 def sidebar() -> rx.Component:
     return rx.el.div(
         rx.el.div(
-            rx.el.a(
-                rx.icon("activity", class_name="h-6 w-6 text-[#C00264]"),
-                rx.el.span("IT Helpdesk", class_name="sr-only"),
-                href="/",
-                class_name="flex items-center gap-2 font-semibold",
-            ),
-            class_name="flex h-[60px] items-center border-b px-6",
+            rx.el.div(
+                rx.el.a(
+                    rx.icon("activity", class_name="h-6 w-6 text-[#C00264]"),
+                    rx.el.span("IT Helpdesk", class_name="sr-only"),
+                    href="/",
+                    class_name="flex items-center gap-2 font-semibold",
+                ),
+                rx.el.button(
+                    rx.icon("log-out", class_name="w-4 h-4 mr-2"),
+                    "Logout",
+                    on_click=AuthState.logout,
+                    class_name="ml-auto text-sm font-medium text-gray-600 hover:text-gray-900",
+                ),
+                class_name="flex h-[60px] items-center border-b px-6 w-full",
+            )
         ),
         rx.el.div(
             rx.el.nav(
@@ -41,7 +52,7 @@ def sidebar() -> rx.Component:
             ),
             class_name="flex-1 overflow-auto py-2",
         ),
-        class_name="hidden border-r bg-white md:block",
+        class_name="hidden border-r bg-white md:flex md:flex-col",
     )
 
 
@@ -269,13 +280,48 @@ def dashboard() -> rx.Component:
     )
 
 
-def index() -> rx.Component:
+def admin_dashboard_page() -> rx.Component:
     return rx.el.div(
         sidebar(),
         dashboard(),
         edit_ticket_dialog(),
         delete_ticket_alert(),
         class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3]",
+    )
+
+
+def user_dashboard_page() -> rx.Component:
+    return rx.el.div(
+        rx.el.header(
+            rx.el.div(
+                rx.el.a(
+                    rx.icon("activity", class_name="h-6 w-6 text-[#C00264]"),
+                    rx.el.span("IT Helpdesk", class_name="sr-only"),
+                    href="/",
+                    class_name="flex items-center gap-2 font-semibold",
+                ),
+                rx.el.button(
+                    rx.icon("log-out", class_name="w-4 h-4 mr-2"),
+                    "Logout",
+                    on_click=AuthState.logout,
+                    class_name="ml-auto text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center",
+                ),
+                class_name="flex items-center h-full px-6 w-full",
+            ),
+            class_name="h-[60px] border-b bg-white",
+        ),
+        user_dashboard(),
+        class_name="min-h-screen w-full font-['Inter'] bg-[#EAEFF3]",
+    )
+
+
+def index() -> rx.Component:
+    return rx.el.div(
+        rx.cond(
+            AuthState.is_logged_in,
+            rx.cond(AuthState.is_admin, admin_dashboard_page(), user_dashboard_page()),
+            login_page(),
+        )
     )
 
 
@@ -322,8 +368,9 @@ app = rx.App(
         ),
     ],
 )
-app.add_page(index, route="/")
-app.add_page(users_page, route="/users")
-app.add_page(computers_page, route="/computers")
-app.add_page(ra_page, route="/ra")
-app.add_page(services_page, route="/services")
+app.add_page(index, on_load=AuthState.check_login)
+app.add_page(login_page, route="/login")
+app.add_page(users_page, route="/users", on_load=AuthState.check_login)
+app.add_page(computers_page, route="/computers", on_load=AuthState.check_login)
+app.add_page(ra_page, route="/ra", on_load=AuthState.check_login)
+app.add_page(services_page, route="/services", on_load=AuthState.check_login)
