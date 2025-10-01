@@ -13,7 +13,7 @@ class AuthState(rx.State):
         return self.user is not None
 
     @rx.event
-    def login(self, form_data: dict):
+    async def login(self, form_data: dict):
         self.error_message = ""
         username = form_data.get("username", "").strip()
         password = form_data.get("password", "")
@@ -33,7 +33,8 @@ class AuthState(rx.State):
         elif password == "123456789":
             from app.states.user_state import UserState
 
-            all_users = UserState.users
+            user_state = await self.get_state(UserState)
+            all_users = user_state.users
             found_user = next((u for u in all_users if u["email"] == username), None)
             if found_user:
                 self.user = found_user
