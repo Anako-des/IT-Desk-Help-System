@@ -1,5 +1,5 @@
 import reflex as rx
-from app.states.ra_state import RAState, RA
+from app.states.ra_state import RAState, RA, User, Computer
 
 def_dialog_style = {
     "position": "fixed",
@@ -61,7 +61,7 @@ def add_ra_dialog() -> rx.Component:
             rx.dialog.title("Add New Assignment"),
             rx.dialog.description("Assign a device to a user."),
             rx.el.form(
-                form_select_field("User", "user_rfc", RAState.users, "rfc", "name"),
+                form_select_field("User", "user_id", RAState.users, "ID", "name"),
                 form_select_field(
                     "Computer",
                     "dispositivo_nserie",
@@ -101,11 +101,11 @@ def edit_ra_dialog() -> rx.Component:
             rx.el.form(
                 form_select_field(
                     "User",
-                    "user_rfc",
+                    "user_id",
                     RAState.users,
-                    "rfc",
+                    "ID",
                     "name",
-                    default_value=RAState.editing_ra["user_rfc"].to_string(),
+                    default_value=RAState.editing_ra["user_id"].to_string(),
                 ),
                 form_select_field(
                     "Computer",
@@ -175,8 +175,8 @@ def delete_ra_alert() -> rx.Component:
 
 def ra_row(ra: RA) -> rx.Component:
     return rx.el.tr(
-        rx.el.td(ra["user_rfc"], class_name="px-4 py-3 font-medium"),
-        rx.el.td(ra["dispositivo_nserie"], class_name="px-4 py-3"),
+        rx.el.td(ra["user_name"], class_name="px-4 py-3 font-medium"),
+        rx.el.td(ra["dispositivo_name"], class_name="px-4 py-3"),
         rx.el.td(ra["fechaA"], class_name="px-4 py-3"),
         rx.el.td(ra["comentarios"], class_name="px-4 py-3 truncate max-w-xs"),
         rx.el.td(
@@ -226,7 +226,7 @@ def ra_page_content() -> rx.Component:
                     class_name="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400",
                 ),
                 rx.el.input(
-                    placeholder="Search by User RFC, Device S/N, or comments...",
+                    placeholder="Search by User, Device, or comments...",
                     on_change=RAState.set_search_query,
                     class_name="pl-10 w-full bg-white border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#C00264]/50",
                 ),
@@ -238,8 +238,8 @@ def ra_page_content() -> rx.Component:
             rx.el.table(
                 rx.el.thead(
                     rx.el.tr(
-                        rx.el.th("User RFC", class_name="text-left font-medium p-3"),
-                        rx.el.th("Device S/N", class_name="text-left font-medium p-3"),
+                        rx.el.th("User", class_name="text-left font-medium p-3"),
+                        rx.el.th("Device", class_name="text-left font-medium p-3"),
                         rx.el.th(
                             "Assignment Date", class_name="text-left font-medium p-3"
                         ),

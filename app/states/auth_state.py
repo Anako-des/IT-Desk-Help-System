@@ -1,6 +1,7 @@
 import reflex as rx
-from typing import Optional, TypedDict
+from typing import Optional
 from app.states.user_state import User
+from sqlalchemy import text
 
 
 class AuthState(rx.State):
@@ -14,36 +15,40 @@ class AuthState(rx.State):
 
     @rx.event
     async def login(self, form_data: dict):
+        """
+        Handles user login by checking credentials against the database.
+        - Admin: jhernandez / 123456789 (hardcoded)
+        - DB User: email from 'user' table and 'contrasenna' field
+        """
         self.error_message = ""
-        username = form_data.get("username", "").strip()
+        email = form_data.get("username", "").strip()
         password = form_data.get("password", "")
-        if not username or not password:
-            self.error_message = "Username and password are required."
+        if not email or not password:
+            self.error_message = "Email and password are required."
             return
-        if username == "jhernandez" and password == "123456789":
+        if email == "jhernandez" and password == "123456789":
             self.user = User(
-                id=0,
-                rfc="ADMIN",
-                name="Admin User",
-                email="jhernandez@example.com",
-                puesto="Administrator",
+                ID=0, name="Admin User", email="jhernandez@example.com", area="IT"
             )
             self.is_admin = True
             return rx.redirect("/")
-        elif password == "123456789":
-            from app.states.user_state import UserState
-
-            user_state = await self.get_state(UserState)
-            all_users = user_state.users
-            found_user = next((u for u in all_users if u["email"] == username), None)
-            if found_user:
-                self.user = found_user
+        async with rx.asession() as session:
+            query = text(
+                "SELECT ID, name, email, contrasenna, area FROM user WHERE email = :email"
+            )
+            result = await session.execute(query, {"email": email})
+            db_user = result.first()
+            if db_user and db_user.contrasenna == password:
+                self.user = User(
+                    ID=db_user.ID,
+                    name=db_user.name,
+                    email=db_user.email,
+                    area=db_user.area,
+                )
                 self.is_admin = False
                 return rx.redirect("/")
             else:
-                self.error_message = "Invalid credentials."
-        else:
-            self.error_message = "Invalid credentials."
+                self.error_message = "Invalid email or password."
 
     @rx.event
     def logout(self):

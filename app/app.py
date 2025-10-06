@@ -1,6 +1,10 @@
 import reflex as rx
 from app.states.ticket_state import TicketState, Ticket
 from app.states.auth_state import AuthState
+from app.states.user_state import UserState
+from app.states.computer_state import ComputerState
+from app.states.ra_state import RAState
+from app.states.service_state import ServiceState
 from app.users_page import users_page_content
 from app.computers_page import computers_page_content
 from app.ra_page import ra_page_content
@@ -368,9 +372,21 @@ app = rx.App(
         ),
     ],
 )
-app.add_page(index, on_load=AuthState.check_login)
+app.add_page(index, on_load=[AuthState.check_login, TicketState.load_tickets])
 app.add_page(login_page, route="/login")
-app.add_page(users_page, route="/users", on_load=AuthState.check_login)
-app.add_page(computers_page, route="/computers", on_load=AuthState.check_login)
-app.add_page(ra_page, route="/ra", on_load=AuthState.check_login)
-app.add_page(services_page, route="/services", on_load=AuthState.check_login)
+app.add_page(
+    users_page, route="/users", on_load=[AuthState.check_login, UserState.load_users]
+)
+app.add_page(
+    computers_page,
+    route="/computers",
+    on_load=[AuthState.check_login, ComputerState.load_computers],
+)
+app.add_page(
+    ra_page, route="/ra", on_load=[AuthState.check_login, RAState.load_all_data]
+)
+app.add_page(
+    services_page,
+    route="/services",
+    on_load=[AuthState.check_login, ServiceState.load_services],
+)

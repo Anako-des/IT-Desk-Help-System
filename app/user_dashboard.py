@@ -59,10 +59,11 @@ def user_dashboard() -> rx.Component:
                         class_name="border-b bg-gray-50",
                     )
                 ),
-                rx.el.tbody(rx.foreach(TicketState.tickets, user_ticket_row)),
+                rx.el.tbody(rx.foreach(TicketState.user_tickets, user_ticket_row)),
                 class_name="w-full text-sm",
             ),
             class_name="border rounded-lg overflow-hidden bg-white",
         ),
         class_name="flex-1 p-6 space-y-6 bg-[#EAEFF3]",
+        on_mount=TicketState.load_user_tickets(AuthState.user["ID"]),
     )

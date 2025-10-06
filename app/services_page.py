@@ -40,7 +40,7 @@ def add_service_dialog() -> rx.Component:
                 form_field(
                     "Features", "caracteristicas", "Describe the service features..."
                 ),
-                form_field("Type ID", "tipo_id", "Enter a numeric Type ID"),
+                form_field("Type", "tipo", "e.g. Hardware, Software"),
                 rx.el.div(
                     rx.el.button(
                         "Cancel",
@@ -85,10 +85,10 @@ def edit_service_dialog() -> rx.Component:
                     ].to_string(),
                 ),
                 form_field(
-                    "Type ID",
-                    "tipo_id",
+                    "Type",
+                    "tipo",
                     "",
-                    default_value=ServiceState.editing_service["tipo_id"].to_string(),
+                    default_value=ServiceState.editing_service["tipo"].to_string(),
                 ),
                 rx.el.div(
                     rx.el.button(
@@ -146,7 +146,7 @@ def service_row(service: Service) -> rx.Component:
     return rx.el.tr(
         rx.el.td(service["nombre"], class_name="px-4 py-3 font-medium"),
         rx.el.td(service["caracteristicas"], class_name="px-4 py-3"),
-        rx.el.td(service["tipo_id"], class_name="px-4 py-3"),
+        rx.el.td(service["tipo"], class_name="px-4 py-3"),
         rx.el.td(
             rx.el.div(
                 rx.el.button(
@@ -205,7 +205,7 @@ def services_page_content() -> rx.Component:
                     rx.el.tr(
                         rx.el.th("Name", class_name="text-left font-medium p-3"),
                         rx.el.th("Features", class_name="text-left font-medium p-3"),
-                        rx.el.th("Type ID", class_name="text-left font-medium p-3"),
+                        rx.el.th("Type", class_name="text-left font-medium p-3"),
                         rx.el.th("Actions", class_name="text-left font-medium p-3"),
                         class_name="border-b bg-gray-50",
                     )

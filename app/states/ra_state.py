@@ -1,97 +1,72 @@
 import reflex as rx
 from typing import TypedDict, Optional
-import datetime
+from sqlalchemy import text
 from app.states.user_state import User
 from app.states.computer_state import Computer
 
 
 class RA(TypedDict):
-    id: int
-    user_rfc: str
+    ID: int
+    user_id: int
     dispositivo_nserie: str
     fechaA: str
     comentarios: str
+    user_name: str
+    dispositivo_name: str
 
 
 class RAState(rx.State):
-    ras: list[RA] = [
-        {
-            "id": 1,
-            "user_rfc": "ABCD123456XYZ",
-            "dispositivo_nserie": "SN12345",
-            "fechaA": "2023-02-01",
-            "comentarios": "Initial assignment",
-        },
-        {
-            "id": 2,
-            "user_rfc": "EFGH789012ABC",
-            "dispositivo_nserie": "SN67890",
-            "fechaA": "2023-03-15",
-            "comentarios": "Loaner device",
-        },
-    ]
-    users: list[User] = [
-        {
-            "id": 1,
-            "rfc": "ABCD123456XYZ",
-            "name": "John Doe",
-            "email": "john.doe@example.com",
-            "puesto": "Developer",
-        },
-        {
-            "id": 2,
-            "rfc": "EFGH789012ABC",
-            "name": "Jane Smith",
-            "email": "jane.smith@example.com",
-            "puesto": "Designer",
-        },
-        {
-            "id": 3,
-            "rfc": "IJKL345678DEF",
-            "name": "Peter Jones",
-            "email": "peter.jones@example.com",
-            "puesto": "Project Manager",
-        },
-    ]
-    computers: list[Computer] = [
-        {
-            "id": 1,
-            "nserie": "SN12345",
-            "name": "Laptop Pro",
-            "marca": "BrandA",
-            "fechaS": "2023-01-15",
-        },
-        {
-            "id": 2,
-            "nserie": "SN67890",
-            "name": "Desktop 5000",
-            "marca": "BrandB",
-            "fechaS": "2022-11-20",
-        },
-    ]
+    ras: list[RA] = []
+    users: list[User] = []
+    computers: list[Computer] = []
     show_add_dialog: bool = False
     show_edit_dialog: bool = False
     show_delete_alert: bool = False
     editing_ra: Optional[RA] = None
     ra_to_delete: Optional[RA] = None
     search_query: str = ""
-    next_id: int = 3
 
     @rx.var
     def filtered_ras(self) -> list[RA]:
-        """This computed var filters the RA list based on the search query.
-        In a database-backed app, this filtering would happen in the SQL query.
-        SQL Query (example): SELECT * FROM RA WHERE user_rfc LIKE '%query%' OR dispositivo_nserie LIKE '%query%'
-        """
         if not self.search_query:
             return self.ras
+        query = self.search_query.lower()
         return [
             r
             for r in self.ras
-            if self.search_query.lower() in r["user_rfc"].lower()
-            or self.search_query.lower() in r["dispositivo_nserie"].lower()
-            or self.search_query.lower() in r["comentarios"].lower()
+            if query in r["user_name"].lower()
+            or query in r["dispositivo_nserie"].lower()
+            or query in r["dispositivo_name"].lower()
+            or (query in r["comentarios"].lower())
         ]
+
+    @rx.event(background=True)
+    async def load_all_data(self):
+        async with self:
+            self.ras = []
+            self.users = []
+            self.computers = []
+        async with rx.asession() as session:
+            ra_query = text("""
+                SELECT RA.ID, RA.user_id, RA.dispositivo_nserie, DATE_FORMAT(RA.fechaA, '%Y-%m-%d') as fechaA, 
+                RA.comentarios, user.name as user_name, Dispositivos.name as dispositivo_name 
+                FROM RA 
+                JOIN user ON RA.user_id = user.ID 
+                JOIN Dispositivos ON RA.dispositivo_nserie = Dispositivos.nserie 
+                ORDER BY RA.fechaA DESC
+                """)
+            ra_result = await session.execute(ra_query)
+            ra_data = [dict(row) for row in ra_result.mappings()]
+            user_query = text("SELECT ID, name, email, area FROM user ORDER BY name")
+            user_result = await session.execute(user_query)
+            user_data = [dict(row) for row in user_result.mappings()]
+            computer_query = text("SELECT nserie, name FROM Dispositivos ORDER BY name")
+            computer_result = await session.execute(computer_query)
+            computer_data = [dict(row) for row in computer_result.mappings()]
+            async with self:
+                self.ras = ra_data
+                self.users = user_data
+                self.computers = computer_data
 
     @rx.event
     def set_search_query(self, query: str):
@@ -105,21 +80,17 @@ class RAState(rx.State):
     def close_add_modal(self):
         self.show_add_dialog = False
 
-    @rx.event
-    def add_ra(self, form_data: dict):
-        """Adds a new RA record.
-        SQL Query: INSERT INTO RA (user_rfc, dispositivo_nserie, fechaA, comentarios) VALUES (...);
-        """
-        new_ra = RA(
-            id=self.next_id,
-            user_rfc=form_data["user_rfc"],
-            dispositivo_nserie=form_data["dispositivo_nserie"],
-            comentarios=form_data["comentarios"],
-            fechaA=datetime.date.today().isoformat(),
-        )
-        self.ras.append(new_ra)
-        self.next_id += 1
-        return RAState.close_add_modal
+    @rx.event(background=True)
+    async def add_ra(self, form_data: dict):
+        async with rx.asession() as session:
+            async with session.begin():
+                query = text(
+                    "INSERT INTO RA (user_id, dispositivo_nserie, fechaA, comentarios) VALUES (:user_id, :dispositivo_nserie, CURDATE(), :comentarios)"
+                )
+                await session.execute(query, form_data)
+        async with self:
+            yield RAState.close_add_modal
+            yield RAState.load_all_data
 
     @rx.event
     def show_edit_modal(self, ra: RA):
@@ -131,35 +102,43 @@ class RAState(rx.State):
         self.show_edit_dialog = False
         self.editing_ra = None
 
-    @rx.event
-    def update_ra(self, form_data: dict):
-        """Updates an existing RA record.
-        SQL Query: UPDATE RA SET user_rfc = ..., dispositivo_nserie = ..., comentarios = ... WHERE ID = ...;
-        """
+    @rx.event(background=True)
+    async def update_ra(self, form_data: dict):
         if self.editing_ra is None:
             return
-        ra_id = self.editing_ra["id"]
-        for i, ra in enumerate(self.ras):
-            if ra["id"] == ra_id:
-                self.ras[i]["user_rfc"] = form_data["user_rfc"]
-                self.ras[i]["dispositivo_nserie"] = form_data["dispositivo_nserie"]
-                self.ras[i]["comentarios"] = form_data["comentarios"]
-                break
-        return RAState.close_edit_modal
+        async with rx.asession() as session:
+            async with session.begin():
+                query = text(
+                    "UPDATE RA SET user_id = :user_id, dispositivo_nserie = :dispositivo_nserie, comentarios = :comentarios WHERE ID = :ra_id"
+                )
+                await session.execute(
+                    query,
+                    {
+                        "user_id": form_data["user_id"],
+                        "dispositivo_nserie": form_data["dispositivo_nserie"],
+                        "comentarios": form_data["comentarios"],
+                        "ra_id": self.editing_ra["ID"],
+                    },
+                )
+        async with self:
+            yield RAState.close_edit_modal
+            yield RAState.load_all_data
 
     @rx.event
     def show_delete_confirmation(self, ra: RA):
         self.ra_to_delete = ra
         self.show_delete_alert = True
 
-    @rx.event
-    def delete_ra(self):
-        """Deletes an RA record.
-        SQL Query: DELETE FROM RA WHERE ID = ...;
-        """
+    @rx.event(background=True)
+    async def delete_ra(self):
         if self.ra_to_delete:
-            self.ras = [r for r in self.ras if r["id"] != self.ra_to_delete["id"]]
-        return RAState.cancel_delete
+            async with rx.asession() as session:
+                async with session.begin():
+                    query = text("DELETE FROM RA WHERE ID = :ra_id")
+                    await session.execute(query, {"ra_id": self.ra_to_delete["ID"]})
+        async with self:
+            yield RAState.cancel_delete
+            yield RAState.load_all_data
 
     @rx.event
     def cancel_delete(self):
