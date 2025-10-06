@@ -1,25 +1,47 @@
 import reflex as rx
 from typing import TypedDict, Optional
-from sqlalchemy import text
 import datetime
 
 
 class Computer(TypedDict):
+    id: int
     nserie: str
     name: str
     marca: str
     fechaS: str
-    tipo: str
 
 
 class ComputerState(rx.State):
-    computers: list[Computer] = []
+    computers: list[Computer] = [
+        {
+            "id": 1,
+            "nserie": "SN12345",
+            "name": "Laptop Pro",
+            "marca": "BrandA",
+            "fechaS": "2023-01-15",
+        },
+        {
+            "id": 2,
+            "nserie": "SN67890",
+            "name": "Desktop 5000",
+            "marca": "BrandB",
+            "fechaS": "2022-11-20",
+        },
+        {
+            "id": 3,
+            "nserie": "SN54321",
+            "name": "Ultrabook Flex",
+            "marca": "BrandA",
+            "fechaS": "2023-05-10",
+        },
+    ]
     show_add_dialog: bool = False
     show_edit_dialog: bool = False
     show_delete_alert: bool = False
     editing_computer: Optional[Computer] = None
     computer_to_delete: Optional[Computer] = None
     search_query: str = ""
+    next_id: int = 4
 
     @rx.var
     def filtered_computers(self) -> list[Computer]:
@@ -33,19 +55,6 @@ class ComputerState(rx.State):
             or self.search_query.lower() in c["nserie"].lower()
         ]
 
-    @rx.event(background=True)
-    async def load_computers(self):
-        async with self:
-            self.computers = []
-        async with rx.asession() as session:
-            query = text(
-                "SELECT nserie, name, marca, DATE_FORMAT(fechaS, '%Y-%m-%d') as fechaS, tipo FROM Dispositivos ORDER BY name"
-            )
-            result = await session.execute(query)
-            computers_data = [dict(row) for row in result.mappings()]
-            async with self:
-                self.computers = computers_data
-
     @rx.event
     def set_search_query(self, query: str):
         self.search_query = query
@@ -58,25 +67,18 @@ class ComputerState(rx.State):
     def close_add_modal(self):
         self.show_add_dialog = False
 
-    @rx.event(background=True)
-    async def add_computer(self, form_data: dict):
-        async with rx.asession() as session:
-            async with session.begin():
-                query = text(
-                    "INSERT INTO Dispositivos (nserie, name, marca, fechaS, tipo) VALUES (:nserie, :name, :marca, CURDATE(), :tipo)"
-                )
-                await session.execute(
-                    query,
-                    {
-                        "nserie": form_data["nserie"],
-                        "name": form_data["name"],
-                        "marca": form_data["marca"],
-                        "tipo": form_data["tipo"],
-                    },
-                )
-        async with self:
-            yield ComputerState.close_add_modal
-            yield ComputerState.load_computers
+    @rx.event
+    def add_computer(self, form_data: dict):
+        new_computer = Computer(
+            id=self.next_id,
+            nserie=form_data["nserie"],
+            name=form_data["name"],
+            marca=form_data["marca"],
+            fechaS=datetime.date.today().isoformat(),
+        )
+        self.computers.append(new_computer)
+        self.next_id += 1
+        return ComputerState.close_add_modal
 
     @rx.event
     def show_edit_modal(self, computer: Computer):
@@ -88,47 +90,39 @@ class ComputerState(rx.State):
         self.show_edit_dialog = False
         self.editing_computer = None
 
-    @rx.event(background=True)
-    async def update_computer(self, form_data: dict):
+    @rx.event
+    def update_computer(self, form_data: dict):
         if self.editing_computer is None:
             return
-        async with rx.asession() as session:
-            async with session.begin():
-                query = text(
-                    "UPDATE Dispositivos SET name = :name, marca = :marca, tipo = :tipo WHERE nserie = :nserie"
-                )
-                await session.execute(
-                    query,
-                    {
-                        "name": form_data["name"],
-                        "marca": form_data["marca"],
-                        "tipo": form_data["tipo"],
-                        "nserie": self.editing_computer["nserie"],
-                    },
-                )
-        async with self:
-            yield ComputerState.close_edit_modal
-            yield ComputerState.load_computers
+        computer_id = self.editing_computer["id"]
+        for i, computer in enumerate(self.computers):
+            if computer["id"] == computer_id:
+                self.computers[i]["nserie"] = form_data["nserie"]
+                self.computers[i]["name"] = form_data["name"]
+                self.computers[i]["marca"] = form_data["marca"]
+                break
+        return ComputerState.close_edit_modal
 
     @rx.event
     def show_delete_confirmation(self, computer: Computer):
         self.computer_to_delete = computer
         self.show_delete_alert = True
 
-    @rx.event(background=True)
-    async def delete_computer(self):
+    @rx.event
+    def delete_computer(self):
         if self.computer_to_delete:
-            async with rx.asession() as session:
-                async with session.begin():
-                    query = text("DELETE FROM Dispositivos WHERE nserie = :nserie")
-                    await session.execute(
-                        query, {"nserie": self.computer_to_delete["nserie"]}
-                    )
-        async with self:
-            yield ComputerState.cancel_delete
-            yield ComputerState.load_computers
+            self.computers = [
+                c for c in self.computers if c["id"] != self.computer_to_delete["id"]
+            ]
+        return ComputerState.cancel_delete
 
     @rx.event
     def cancel_delete(self):
         self.show_delete_alert = False
         self.computer_to_delete = None
+
+    @rx.event
+    def set_show_delete_alert(self, value: bool):
+        self.show_delete_alert = value
+        if not value:
+            self.computer_to_delete = None

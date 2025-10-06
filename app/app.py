@@ -1,16 +1,7 @@
 import reflex as rx
 from app.states.ticket_state import TicketState, Ticket
-from app.states.auth_state import AuthState
-from app.states.user_state import UserState
-from app.states.computer_state import ComputerState
-from app.states.ra_state import RAState
-from app.states.service_state import ServiceState
 from app.users_page import users_page_content
 from app.computers_page import computers_page_content
-from app.ra_page import ra_page_content
-from app.services_page import services_page_content
-from app.login_page import login_page
-from app.user_dashboard import user_dashboard
 
 
 def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
@@ -28,35 +19,27 @@ def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
 def sidebar() -> rx.Component:
     return rx.el.div(
         rx.el.div(
-            rx.el.div(
-                rx.el.a(
-                    rx.icon("activity", class_name="h-6 w-6 text-[#C00264]"),
-                    rx.el.span("IT Helpdesk", class_name="sr-only"),
-                    href="/",
-                    class_name="flex items-center gap-2 font-semibold",
-                ),
-                rx.el.button(
-                    rx.icon("log-out", class_name="w-4 h-4 mr-2"),
-                    "Logout",
-                    on_click=AuthState.logout,
-                    class_name="ml-auto text-sm font-medium text-gray-600 hover:text-gray-900",
-                ),
-                class_name="flex h-[60px] items-center border-b px-6 w-full",
-            )
+            rx.el.a(
+                rx.icon("activity", class_name="h-6 w-6 text-[#C00264]"),
+                rx.el.span("IT Helpdesk", class_name="sr-only"),
+                href="/",
+                class_name="flex items-center gap-2 font-semibold",
+            ),
+            class_name="flex h-[60px] items-center border-b px-6",
         ),
         rx.el.div(
             rx.el.nav(
                 sidebar_item("Dashboard", "home", "/"),
                 sidebar_item("Users", "users", "/users"),
                 sidebar_item("Computers", "laptop", "/computers"),
-                sidebar_item("RA", "file-text", "/ra"),
-                sidebar_item("Services", "settings", "/services"),
+                sidebar_item("RA", "file-text", "#"),
+                sidebar_item("Services", "settings", "#"),
                 sidebar_item("Ticket", "ticket", "#"),
                 class_name="grid items-start px-4 text-sm font-medium",
             ),
             class_name="flex-1 overflow-auto py-2",
         ),
-        class_name="hidden border-r bg-white md:flex md:flex-col",
+        class_name="hidden border-r bg-white md:block",
     )
 
 
@@ -284,48 +267,13 @@ def dashboard() -> rx.Component:
     )
 
 
-def admin_dashboard_page() -> rx.Component:
+def index() -> rx.Component:
     return rx.el.div(
         sidebar(),
         dashboard(),
         edit_ticket_dialog(),
         delete_ticket_alert(),
         class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3]",
-    )
-
-
-def user_dashboard_page() -> rx.Component:
-    return rx.el.div(
-        rx.el.header(
-            rx.el.div(
-                rx.el.a(
-                    rx.icon("activity", class_name="h-6 w-6 text-[#C00264]"),
-                    rx.el.span("IT Helpdesk", class_name="sr-only"),
-                    href="/",
-                    class_name="flex items-center gap-2 font-semibold",
-                ),
-                rx.el.button(
-                    rx.icon("log-out", class_name="w-4 h-4 mr-2"),
-                    "Logout",
-                    on_click=AuthState.logout,
-                    class_name="ml-auto text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center",
-                ),
-                class_name="flex items-center h-full px-6 w-full",
-            ),
-            class_name="h-[60px] border-b bg-white",
-        ),
-        user_dashboard(),
-        class_name="min-h-screen w-full font-['Inter'] bg-[#EAEFF3]",
-    )
-
-
-def index() -> rx.Component:
-    return rx.el.div(
-        rx.cond(
-            AuthState.is_logged_in,
-            rx.cond(AuthState.is_admin, admin_dashboard_page(), user_dashboard_page()),
-            login_page(),
-        )
     )
 
 
@@ -345,22 +293,6 @@ def computers_page() -> rx.Component:
     )
 
 
-def ra_page() -> rx.Component:
-    return rx.el.div(
-        sidebar(),
-        ra_page_content(),
-        class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3]",
-    )
-
-
-def services_page() -> rx.Component:
-    return rx.el.div(
-        sidebar(),
-        services_page_content(),
-        class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3]",
-    )
-
-
 app = rx.App(
     theme=rx.theme(appearance="light"),
     head_components=[
@@ -372,21 +304,6 @@ app = rx.App(
         ),
     ],
 )
-app.add_page(index, on_load=[AuthState.check_login, TicketState.load_tickets])
-app.add_page(login_page, route="/login")
-app.add_page(
-    users_page, route="/users", on_load=[AuthState.check_login, UserState.load_users]
-)
-app.add_page(
-    computers_page,
-    route="/computers",
-    on_load=[AuthState.check_login, ComputerState.load_computers],
-)
-app.add_page(
-    ra_page, route="/ra", on_load=[AuthState.check_login, RAState.load_all_data]
-)
-app.add_page(
-    services_page,
-    route="/services",
-    on_load=[AuthState.check_login, ServiceState.load_services],
-)
+app.add_page(index, route="/")
+app.add_page(users_page, route="/users")
+app.add_page(computers_page, route="/computers")

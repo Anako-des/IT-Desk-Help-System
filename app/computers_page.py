@@ -72,115 +72,6 @@ def edit_computer_dialog() -> rx.Component:
                     "Serial Number",
                     "nserie",
                     "",
-                    default_value=str(ComputerState.editing_computer["nserie"]),
-                ),
-                form_field(
-                    "Name",
-                    "name",
-                    "",
-                    default_value=str(ComputerState.editing_computer["name"]),
-                ),
-                form_field(
-                    "Brand",
-                    "marca",
-                    "",
-                    default_value=str(ComputerState.editing_computer["marca"]),
-                ),
-                rx.el.div(
-                    rx.el.button(
-                        "Cancel",
-                        on_click=ComputerState.close_edit_modal,
-                        type="button",
-                        class_name="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300",
-                    ),
-                    rx.el.button(
-                        "Save Changes",
-                        type="submit",
-                        class_name="px-4 py-2 rounded bg-[#C00264] text-white hover:bg-[#B2419B]",
-                    ),
-                    class_name="flex justify-end gap-3 mt-4",
-                ),
-                on_submit=ComputerState.update_computer,
-            ),
-            style=def_dialog_style,
-        ),
-        open=ComputerState.show_edit_dialog,
-    )
-
-
-def delete_computer_alert() -> rx.Component:
-    return rx.alert_dialog.root(
-        rx.alert_dialog.content(
-            rx.alert_dialog.title("Delete Computer"),
-            rx.alert_dialog.description(
-                "Are you sure you want to delete this computer? This action cannot be undone."
-            ),
-            rx.el.div(
-                rx.alert_dialog.cancel(
-                    rx.el.button(
-                        "Cancel",
-                        on_click=ComputerState.cancel_delete,
-                        class_name="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300",
-                    )
-                ),
-                rx.alert_dialog.action(
-                    rx.el.button(
-                        "Delete",
-                        on_click=ComputerState.delete_computer,
-                        class_name="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600",
-                    )
-                ),
-                class_name="flex justify-end gap-3 mt-4",
-            ),
-            style=def_dialog_style,
-        ),
-        open=ComputerState.show_delete_alert,
-    )
-
-
-def add_computer_dialog() -> rx.Component:
-    return rx.dialog.root(
-        rx.dialog.content(
-            rx.dialog.title("Add New Computer"),
-            rx.dialog.description("Fill in the details for the new computer."),
-            rx.el.form(
-                form_field("Serial Number", "nserie", "Enter device's serial number"),
-                form_field("Name", "name", "Enter device name (e.g., Laptop Pro)"),
-                form_field("Brand", "marca", "Enter device brand"),
-                form_field("Type", "tipo", "e.g. Laptop, Desktop, Software"),
-                rx.el.div(
-                    rx.el.button(
-                        "Cancel",
-                        on_click=ComputerState.close_add_modal,
-                        type="button",
-                        class_name="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300",
-                    ),
-                    rx.el.button(
-                        "Add Computer",
-                        type="submit",
-                        class_name="px-4 py-2 rounded bg-[#C00264] text-white hover:bg-[#B2419B]",
-                    ),
-                    class_name="flex justify-end gap-3 mt-4",
-                ),
-                on_submit=ComputerState.add_computer,
-                reset_on_submit=True,
-            ),
-            style=def_dialog_style,
-        ),
-        open=ComputerState.show_add_dialog,
-    )
-
-
-def edit_computer_dialog() -> rx.Component:
-    return rx.dialog.root(
-        rx.dialog.content(
-            rx.dialog.title("Edit Computer"),
-            rx.dialog.description("Update the computer information below."),
-            rx.el.form(
-                form_field(
-                    "Serial Number",
-                    "nserie",
-                    "",
                     default_value=ComputerState.editing_computer["nserie"].to_string(),
                 ),
                 form_field(
@@ -194,12 +85,6 @@ def edit_computer_dialog() -> rx.Component:
                     "marca",
                     "",
                     default_value=ComputerState.editing_computer["marca"].to_string(),
-                ),
-                form_field(
-                    "Type",
-                    "tipo",
-                    "",
-                    default_value=ComputerState.editing_computer["tipo"].to_string(),
                 ),
                 rx.el.div(
                     rx.el.button(
@@ -259,7 +144,6 @@ def computer_row(computer: Computer) -> rx.Component:
         rx.el.td(computer["name"], class_name="px-4 py-3"),
         rx.el.td(computer["marca"], class_name="px-4 py-3"),
         rx.el.td(computer["fechaS"], class_name="px-4 py-3"),
-        rx.el.td(computer["tipo"], class_name="px-4 py-3"),
         rx.el.td(
             rx.el.div(
                 rx.el.button(
@@ -327,7 +211,6 @@ def computers_page_content() -> rx.Component:
                         rx.el.th(
                             "Acquisition Date", class_name="text-left font-medium p-3"
                         ),
-                        rx.el.th("Type", class_name="text-left font-medium p-3"),
                         rx.el.th("Actions", class_name="text-left font-medium p-3"),
                         class_name="border-b bg-gray-50",
                     )

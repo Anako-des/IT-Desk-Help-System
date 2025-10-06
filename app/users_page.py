@@ -36,10 +36,10 @@ def add_user_dialog() -> rx.Component:
             rx.dialog.title("Add New User"),
             rx.dialog.description("Fill in the details for the new user."),
             rx.el.form(
+                form_field("RFC", "rfc", "Enter user's RFC"),
                 form_field("Full Name", "name", "Enter user's full name"),
                 form_field("Email", "email", "Enter user's email"),
-                form_field("Password", "contrasenna", "Enter a password"),
-                form_field("Area", "area", "Enter user's area/department"),
+                form_field("Position", "puesto", "Enter user's position"),
                 rx.el.div(
                     rx.el.button(
                         "Cancel",
@@ -70,6 +70,12 @@ def edit_user_dialog() -> rx.Component:
             rx.dialog.description("Update the user information below."),
             rx.el.form(
                 form_field(
+                    "RFC",
+                    "rfc",
+                    "",
+                    default_value=UserState.editing_user["rfc"].to_string(),
+                ),
+                form_field(
                     "Full Name",
                     "name",
                     "",
@@ -82,10 +88,10 @@ def edit_user_dialog() -> rx.Component:
                     default_value=UserState.editing_user["email"].to_string(),
                 ),
                 form_field(
-                    "Area",
-                    "area",
+                    "Position",
+                    "puesto",
                     "",
-                    default_value=UserState.editing_user["area"].to_string(),
+                    default_value=UserState.editing_user["puesto"].to_string(),
                 ),
                 rx.el.div(
                     rx.el.button(
@@ -141,9 +147,10 @@ def delete_user_alert() -> rx.Component:
 
 def user_row(user: User) -> rx.Component:
     return rx.el.tr(
-        rx.el.td(user["name"], class_name="px-4 py-3 font-medium"),
+        rx.el.td(user["rfc"], class_name="px-4 py-3 font-medium"),
+        rx.el.td(user["name"], class_name="px-4 py-3"),
         rx.el.td(user["email"], class_name="px-4 py-3"),
-        rx.el.td(user["area"], class_name="px-4 py-3"),
+        rx.el.td(user["puesto"], class_name="px-4 py-3"),
         rx.el.td(
             rx.el.div(
                 rx.el.button(
@@ -188,7 +195,7 @@ def users_page_content() -> rx.Component:
                     class_name="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400",
                 ),
                 rx.el.input(
-                    placeholder="Search by name, email, or area...",
+                    placeholder="Search by name, email, or RFC...",
                     on_change=UserState.set_search_query,
                     class_name="pl-10 w-full bg-white border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#C00264]/50",
                 ),
@@ -200,9 +207,10 @@ def users_page_content() -> rx.Component:
             rx.el.table(
                 rx.el.thead(
                     rx.el.tr(
+                        rx.el.th("RFC", class_name="text-left font-medium p-3"),
                         rx.el.th("Name", class_name="text-left font-medium p-3"),
                         rx.el.th("Email", class_name="text-left font-medium p-3"),
-                        rx.el.th("Area", class_name="text-left font-medium p-3"),
+                        rx.el.th("Position", class_name="text-left font-medium p-3"),
                         rx.el.th("Actions", class_name="text-left font-medium p-3"),
                         class_name="border-b bg-gray-50",
                     )
