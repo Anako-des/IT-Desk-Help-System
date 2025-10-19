@@ -1,5 +1,6 @@
 import reflex as rx
 from typing import TypedDict, Optional
+import datetime
 
 
 class Mantenimiento(TypedDict):
@@ -84,6 +85,29 @@ class MantenimientoState(rx.State):
         },
     ]
     search_query: str = ""
+    show_add_dialog: bool = False
+    next_id: int = 11
+
+    @rx.event
+    def show_add_modal(self):
+        self.show_add_dialog = True
+
+    @rx.event
+    def close_add_modal(self):
+        self.show_add_dialog = False
+
+    @rx.event
+    def add_mantenimiento(self, form_data: dict):
+        new_mantenimiento = Mantenimiento(
+            id=self.next_id,
+            computer_nserie=form_data["computer_nserie"],
+            tipo=form_data["tipo"],
+            descripcion=form_data["descripcion"],
+            fecha=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        )
+        self.mantenimientos.append(new_mantenimiento)
+        self.next_id += 1
+        return MantenimientoState.close_add_modal
 
     @rx.var
     def filtered_mantenimientos(self) -> list[Mantenimiento]:

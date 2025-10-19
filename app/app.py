@@ -38,7 +38,7 @@ def sidebar() -> rx.Component:
                 sidebar_item("RA", "file-text", "/ra"),
                 sidebar_item("Services", "settings", "/services"),
                 sidebar_item("Maintenance", "wrench", "/mantenimiento"),
-                sidebar_item("Ticket", "ticket", "#"),
+                sidebar_item("Ticket", "ticket", "/tickets"),
                 class_name="grid items-start px-4 text-sm font-medium",
             ),
             class_name="flex-1 overflow-auto py-2",
@@ -325,6 +325,16 @@ def mantenimiento_page() -> rx.Component:
     )
 
 
+def tickets_page() -> rx.Component:
+    return rx.el.div(
+        sidebar(),
+        tickets_table(),
+        edit_ticket_dialog(),
+        delete_ticket_alert(),
+        class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3] p-6",
+    )
+
+
 app = rx.App(
     theme=rx.theme(appearance="light"),
     head_components=[
@@ -342,3 +352,4 @@ app.add_page(computers_page, route="/computers")
 app.add_page(ra_page, route="/ra")
 app.add_page(services_page, route="/services")
 app.add_page(mantenimiento_page, route="/mantenimiento")
+app.add_page(tickets_page, route="/tickets")

@@ -134,7 +134,7 @@ class ComputerState(rx.State):
             nserie=form_data["nserie"],
             name=form_data["name"],
             marca=form_data["marca"],
-            fechaS=datetime.date.today().isoformat(),
+            fechaS=form_data.get("fechaS", datetime.date.today().isoformat()),
             tipo=form_data["tipo"],
         )
         self.computers.append(new_computer)
