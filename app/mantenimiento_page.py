@@ -47,6 +47,15 @@ def add_maintenance_dialog() -> rx.Component:
                     class_name="mb-4",
                 ),
                 rx.el.div(
+                    rx.el.label("Date", class_name="font-medium text-gray-700"),
+                    rx.el.input(
+                        name="fecha",
+                        type="datetime-local",
+                        class_name="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C00264]/50",
+                    ),
+                    class_name="mb-4",
+                ),
+                rx.el.div(
                     rx.el.button(
                         "Cancel",
                         on_click=MantenimientoState.close_add_modal,

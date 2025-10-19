@@ -136,7 +136,7 @@ class RAState(rx.State):
             user_rfc=form_data["user_rfc"],
             dispositivo_nserie=form_data["dispositivo_nserie"],
             comentarios=form_data.get("comentarios", ""),
-            fechaA=datetime.date.today().isoformat(),
+            fechaA=form_data.get("fechaA") or datetime.date.today().isoformat(),
         )
         self.ras.append(new_ra)
         self.next_id += 1

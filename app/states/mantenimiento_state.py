@@ -103,7 +103,10 @@ class MantenimientoState(rx.State):
             computer_nserie=form_data["computer_nserie"],
             tipo=form_data["tipo"],
             descripcion=form_data["descripcion"],
-            fecha=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            fecha=(
+                form_data.get("fecha")
+                or datetime.datetime.now().strftime("%Y-%m-%dT%H:%M")
+            ).replace("T", " "),
         )
         self.mantenimientos.append(new_mantenimiento)
         self.next_id += 1

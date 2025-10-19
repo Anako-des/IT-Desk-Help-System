@@ -16,7 +16,11 @@ def_dialog_style = {
 
 
 def form_field(
-    label: str, name: str, placeholder: str, default_value: rx.Var[str] | str = ""
+    label: str,
+    name: str,
+    placeholder: str,
+    default_value: rx.Var[str] | str = "",
+    type: str = "text",
 ) -> rx.Component:
     return rx.el.div(
         rx.el.label(label, class_name="font-medium text-gray-700"),
@@ -24,6 +28,7 @@ def form_field(
             name=name,
             placeholder=placeholder,
             default_value=default_value,
+            type=type,
             class_name="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C00264]/50",
         ),
         class_name="mb-4",
@@ -79,6 +84,7 @@ def add_ra_dialog() -> rx.Component:
                     "name",
                     "Select a computer",
                 ),
+                form_field("Assignment Date", "fechaA", "", type="date"),
                 form_field("Comments", "comentarios", "Enter comments..."),
                 rx.el.div(
                     rx.el.button(
