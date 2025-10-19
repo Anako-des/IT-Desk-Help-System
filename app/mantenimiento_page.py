@@ -21,18 +21,10 @@ def add_maintenance_dialog() -> rx.Component:
             rx.el.form(
                 rx.el.div(
                     rx.el.label("Device S/N", class_name="font-medium text-gray-700"),
-                    rx.el.select(
-                        rx.el.option("Select a device", value="", disabled=True),
-                        rx.foreach(
-                            MantenimientoState.computers,
-                            lambda computer: rx.el.option(
-                                f"{computer['name']} ({computer['nserie']})",
-                                value=computer["nserie"],
-                            ),
-                        ),
+                    rx.el.input(
                         name="computer_nserie",
-                        default_value="",
-                        class_name="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C00264]/50 bg-white",
+                        placeholder="Enter device serial number",
+                        class_name="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C00264]/50",
                     ),
                     class_name="mb-4",
                 ),
@@ -50,15 +42,6 @@ def add_maintenance_dialog() -> rx.Component:
                     rx.el.input(
                         name="descripcion",
                         placeholder="Describe the maintenance done",
-                        class_name="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C00264]/50",
-                    ),
-                    class_name="mb-4",
-                ),
-                rx.el.div(
-                    rx.el.label("Date", class_name="font-medium text-gray-700"),
-                    rx.el.input(
-                        name="fecha",
-                        type="date",
                         class_name="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#C00264]/50",
                     ),
                     class_name="mb-4",
@@ -91,7 +74,6 @@ def add_maintenance_dialog() -> rx.Component:
                 "boxShadow": "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                 "width": "90vw",
                 "maxWidth": "500px",
-                "zIndex": 50,
             },
         ),
         open=MantenimientoState.show_add_dialog,
