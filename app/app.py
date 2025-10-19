@@ -66,9 +66,19 @@ def stat_card(
 def ticket_row(ticket: Ticket) -> rx.Component:
     return rx.el.tr(
         rx.el.td(ticket["folio"], class_name="px-4 py-3 font-medium"),
-        rx.el.td(ticket["solicitante"], class_name="px-4 py-3"),
-        rx.el.td(ticket["description"], class_name="px-4 py-3"),
-        rx.el.td(ticket["responsables"], class_name="px-4 py-3"),
+        rx.el.td(ticket["ra_id"].to_string(), class_name="px-4 py-3"),
+        rx.el.td(ticket["service_id"].to_string(), class_name="px-4 py-3"),
+        rx.el.td(ticket["description"], class_name="px-4 py-3 truncate max-w-xs"),
+        rx.el.td(
+            rx.image(
+                src=ticket["photo"],
+                class_name="h-10 w-10 object-cover rounded-md",
+                fallback="/placeholder.svg",
+            ),
+            class_name="px-4 py-3",
+        ),
+        rx.el.td(ticket["comments"], class_name="px-4 py-3 truncate max-w-xs"),
+        rx.el.td(ticket["dateI"], class_name="px-4 py-3"),
         rx.el.td(
             rx.el.span(
                 ticket["status"],
@@ -87,6 +97,7 @@ def ticket_row(ticket: Ticket) -> rx.Component:
             ),
             class_name="px-4 py-3",
         ),
+        rx.el.td(ticket["dateF"], class_name="px-4 py-3"),
         rx.el.td(
             rx.el.div(
                 rx.el.button(
@@ -135,26 +146,55 @@ def search_filter_bar() -> rx.Component:
 
 def tickets_table() -> rx.Component:
     return rx.el.div(
-        rx.el.h2("All Tickets", class_name="text-xl font-semibold mb-4"),
+        rx.el.div(
+            rx.el.h2("All Tickets", class_name="text-xl font-semibold"),
+            rx.el.button(
+                rx.icon("plus", class_name="mr-2 h-4 w-4"),
+                "Add Ticket",
+                on_click=TicketState.show_add_modal,
+                class_name="flex items-center px-4 py-2 rounded-lg bg-[#C00264] text-white font-medium hover:bg-[#B2419B]",
+            ),
+            class_name="flex items-center justify-between mb-4",
+        ),
         search_filter_bar(),
         rx.el.div(
-            rx.el.table(
-                rx.el.thead(
-                    rx.el.tr(
-                        rx.el.th("Folio", class_name="text-left font-medium p-3"),
-                        rx.el.th("Requester", class_name="text-left font-medium p-3"),
-                        rx.el.th("Description", class_name="text-left font-medium p-3"),
-                        rx.el.th("Responsible", class_name="text-left font-medium p-3"),
-                        rx.el.th("Status", class_name="text-left font-medium p-3"),
-                        rx.el.th("Actions", class_name="text-left font-medium p-3"),
-                        class_name="border-b bg-gray-50",
-                    )
+            rx.el.div(
+                rx.el.table(
+                    rx.el.thead(
+                        rx.el.tr(
+                            rx.el.th("Folio", class_name="text-left font-medium p-3"),
+                            rx.el.th("RA ID", class_name="text-left font-medium p-3"),
+                            rx.el.th(
+                                "Service ID", class_name="text-left font-medium p-3"
+                            ),
+                            rx.el.th(
+                                "Description", class_name="text-left font-medium p-3"
+                            ),
+                            rx.el.th("Photo", class_name="text-left font-medium p-3"),
+                            rx.el.th(
+                                "Comments", class_name="text-left font-medium p-3"
+                            ),
+                            rx.el.th(
+                                "Start Date", class_name="text-left font-medium p-3"
+                            ),
+                            rx.el.th("Status", class_name="text-left font-medium p-3"),
+                            rx.el.th(
+                                "End Date", class_name="text-left font-medium p-3"
+                            ),
+                            rx.el.th("Actions", class_name="text-left font-medium p-3"),
+                            class_name="border-b bg-gray-50",
+                        )
+                    ),
+                    rx.el.tbody(rx.foreach(TicketState.filtered_tickets, ticket_row)),
+                    class_name="w-full text-sm min-w-[1200px]",
                 ),
-                rx.el.tbody(rx.foreach(TicketState.filtered_tickets, ticket_row)),
-                class_name="w-full text-sm",
+                class_name="overflow-x-auto",
             ),
-            class_name="border rounded-lg overflow-hidden bg-white",
+            class_name="border rounded-lg bg-white",
         ),
+        add_ticket_dialog(),
+        edit_ticket_dialog(),
+        delete_ticket_alert(),
     )
 
 
@@ -215,6 +255,93 @@ def edit_ticket_dialog() -> rx.Component:
             },
         ),
         open=TicketState.show_edit_dialog,
+    )
+
+
+def add_ticket_dialog() -> rx.Component:
+    return rx.dialog.root(
+        rx.dialog.content(
+            rx.dialog.title("Add New Ticket"),
+            rx.dialog.description("Fill in the details for the new ticket."),
+            rx.el.form(
+                rx.el.div(
+                    rx.el.label("Folio", class_name="font-medium"),
+                    rx.el.input(
+                        name="folio",
+                        placeholder="e.g., IT-RH-001",
+                        class_name="w-full mt-1 p-2 border rounded",
+                    ),
+                    class_name="mb-4",
+                ),
+                rx.el.div(
+                    rx.el.label("RA ID", class_name="font-medium"),
+                    rx.el.input(
+                        name="ra_id",
+                        placeholder="Enter RA ID",
+                        type="number",
+                        class_name="w-full mt-1 p-2 border rounded",
+                    ),
+                    class_name="mb-4",
+                ),
+                rx.el.div(
+                    rx.el.label("Service ID", class_name="font-medium"),
+                    rx.el.input(
+                        name="service_id",
+                        placeholder="Enter Service ID",
+                        type="number",
+                        class_name="w-full mt-1 p-2 border rounded",
+                    ),
+                    class_name="mb-4",
+                ),
+                rx.el.div(
+                    rx.el.label("Description", class_name="font-medium"),
+                    rx.el.input(
+                        name="description",
+                        placeholder="Describe the issue...",
+                        class_name="w-full mt-1 p-2 border rounded",
+                    ),
+                    class_name="mb-4",
+                ),
+                rx.el.div(
+                    rx.el.label("Comments", class_name="font-medium"),
+                    rx.el.input(
+                        name="comments",
+                        placeholder="Additional comments...",
+                        class_name="w-full mt-1 p-2 border rounded",
+                    ),
+                    class_name="mb-4",
+                ),
+                rx.el.div(
+                    rx.el.button(
+                        "Cancel",
+                        on_click=TicketState.close_add_modal,
+                        type="button",
+                        class_name="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300",
+                    ),
+                    rx.el.button(
+                        "Add Ticket",
+                        type="submit",
+                        class_name="px-4 py-2 rounded bg-[#C00264] text-white hover:bg-[#B2419B]",
+                    ),
+                    class_name="flex justify-end gap-3",
+                ),
+                on_submit=TicketState.add_ticket,
+                reset_on_submit=True,
+            ),
+            style={
+                "position": "fixed",
+                "top": "50%",
+                "left": "50%",
+                "transform": "translate(-50%, -50%)",
+                "background": "white",
+                "padding": "2rem",
+                "borderRadius": "1rem",
+                "boxShadow": "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                "width": "90vw",
+                "maxWidth": "500px",
+            },
+        ),
+        open=TicketState.show_add_dialog,
     )
 
 
@@ -279,6 +406,7 @@ def index() -> rx.Component:
     return rx.el.div(
         sidebar(),
         dashboard(),
+        add_ticket_dialog(),
         edit_ticket_dialog(),
         delete_ticket_alert(),
         class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3]",
@@ -328,10 +456,8 @@ def mantenimiento_page() -> rx.Component:
 def tickets_page() -> rx.Component:
     return rx.el.div(
         sidebar(),
-        tickets_table(),
-        edit_ticket_dialog(),
-        delete_ticket_alert(),
-        class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3] p-6",
+        rx.el.main(tickets_table(), class_name="flex-1 p-6 space-y-6 bg-[#EAEFF3]"),
+        class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3]",
     )
 
 

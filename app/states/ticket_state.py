@@ -1,15 +1,19 @@
 import reflex as rx
 from typing import TypedDict, Optional
+import datetime
 
 
 class Ticket(TypedDict):
     id: int
     folio: str
-    solicitante: Optional[str]
+    ra_id: Optional[int]
+    service_id: Optional[int]
     description: str
-    responsables: str
+    photo: Optional[str]
+    comments: Optional[str]
+    dateI: str
     status: str
-    fecha_creacion: str
+    dateF: Optional[str]
 
 
 class TicketState(rx.State):
@@ -17,100 +21,100 @@ class TicketState(rx.State):
         {
             "id": 1,
             "folio": "IT-RH-001",
-            "solicitante": "rhernandez",
+            "ra_id": 1,
+            "service_id": 1,
             "description": "Necesito instalar la suite de Adobe.",
-            "responsables": "rperez",
+            "photo": "/placeholder.svg",
+            "comments": "Urgente para proyecto.",
+            "dateI": "2024-10-01 09:30:00",
             "status": "Working",
-            "fecha_creacion": "2024-10-01 09:30:00",
+            "dateF": None,
         },
         {
             "id": 2,
             "folio": "FIN-JT-002",
-            "solicitante": "jtorres",
+            "ra_id": 5,
+            "service_id": 3,
             "description": "No tengo acceso a la carpeta de Finanzas.",
-            "responsables": "rhernandez",
+            "photo": None,
+            "comments": "Acceso de solo lectura.",
+            "dateI": "2024-10-05 11:00:00",
             "status": "Finish",
-            "fecha_creacion": "2024-10-05 11:00:00",
+            "dateF": "2024-10-05 12:00:00",
         },
         {
             "id": 3,
             "folio": "IT-AP-003",
-            "solicitante": "rperez",
+            "ra_id": 2,
+            "service_id": 6,
             "description": "Problemas configurando el correo en mi celular.",
-            "responsables": "gbaez",
+            "photo": "/placeholder.svg",
+            "comments": "Usuario no recuerda la contraseña.",
+            "dateI": "2024-11-10 15:20:00",
             "status": "Hold",
-            "fecha_creacion": "2024-11-10 15:20:00",
+            "dateF": None,
         },
         {
             "id": 4,
             "folio": "RH-LR-004",
-            "solicitante": "lramirez",
+            "ra_id": 6,
+            "service_id": 8,
             "description": "La impresora de RH no imprime a color.",
-            "responsables": "rhernandez",
+            "photo": None,
+            "comments": "Revisar niveles de tinta.",
+            "dateI": "2024-11-15 10:00:00",
             "status": "Working",
-            "fecha_creacion": "2024-11-15 10:00:00",
+            "dateF": None,
         },
         {
             "id": 5,
             "folio": "MKT-DC-005",
-            "solicitante": "dcastro",
+            "ra_id": 7,
+            "service_id": 4,
             "description": "Mi laptop no enciende.",
-            "responsables": "rperez",
+            "photo": "/placeholder.svg",
+            "comments": "Posible falla de batería.",
+            "dateI": "2024-12-01 08:45:00",
             "status": "Hold",
-            "fecha_creacion": "2024-12-01 08:45:00",
-        },
-        {
-            "id": 6,
-            "folio": "PRO-VR-006",
-            "solicitante": "vromero",
-            "description": "El equipo está muy lento, requiere mantenimiento.",
-            "responsables": "gbaez",
-            "status": "Finish",
-            "fecha_creacion": "2025-01-20 12:00:00",
-        },
-        {
-            "id": 7,
-            "folio": "VTA-FN-007",
-            "solicitante": "fnavarro",
-            "description": "Necesito la última actualización de Windows.",
-            "responsables": "rhernandez, rperez",
-            "status": "Working",
-            "fecha_creacion": "2025-02-15 14:00:00",
-        },
-        {
-            "id": 8,
-            "folio": "FIN-SV-008",
-            "solicitante": "svega",
-            "description": "Solicito respaldo de mi carpeta de Documentos.",
-            "responsables": "gbaez",
-            "status": "Finish",
-            "fecha_creacion": "2025-03-03 13:00:00",
-        },
-        {
-            "id": 9,
-            "folio": "IT-GB-009",
-            "solicitante": "gbaez",
-            "description": "Creo que tengo un virus, salen pop-ups.",
-            "responsables": "rhernandez, gbaez",
-            "status": "Hold",
-            "fecha_creacion": "2025-04-01 10:10:00",
-        },
-        {
-            "id": 10,
-            "folio": "VTA-ML-010",
-            "solicitante": "mlopez",
-            "description": "Necesito capacitación para usar el nuevo CRM.",
-            "responsables": "rperez",
-            "status": "Working",
-            "fecha_creacion": "2025-04-05 16:00:00",
+            "dateF": None,
         },
     ]
+    show_add_dialog: bool = False
     show_edit_dialog: bool = False
     show_delete_alert: bool = False
     editing_ticket: Optional[Ticket] = None
     ticket_to_delete: Optional[Ticket] = None
     search_query: str = ""
     status_filter: str = "all"
+    next_id: int = 6
+
+    @rx.event
+    def show_add_modal(self):
+        self.show_add_dialog = True
+
+    @rx.event
+    def close_add_modal(self):
+        self.show_add_dialog = False
+
+    @rx.event
+    def add_ticket(self, form_data: dict):
+        new_ticket = Ticket(
+            id=self.next_id,
+            folio=form_data["folio"],
+            ra_id=int(form_data.get("ra_id")) if form_data.get("ra_id") else None,
+            service_id=int(form_data.get("service_id"))
+            if form_data.get("service_id")
+            else None,
+            description=form_data["description"],
+            photo=None,
+            comments=form_data.get("comments"),
+            dateI=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            status="Hold",
+            dateF=None,
+        )
+        self.tickets.append(new_ticket)
+        self.next_id += 1
+        return TicketState.close_add_modal
 
     @rx.event
     def set_search_query(self, query: str):
@@ -177,8 +181,8 @@ class TicketState(rx.State):
                 t
                 for t in tickets
                 if query in t["folio"].lower()
-                or (t["solicitante"] and query in t["solicitante"].lower())
-                or query in t["responsables"].lower()
+                or (t["comments"] and query in t["comments"].lower())
+                or query in t["description"].lower()
             ]
         return tickets
 
