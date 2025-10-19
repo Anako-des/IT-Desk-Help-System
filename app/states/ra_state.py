@@ -17,14 +17,14 @@ class RAState(rx.State):
     ras: list[RA] = [
         {
             "id": 1,
-            "user_rfc": "ABCD123456XYZ",
+            "user_rfc": "johndoe",
             "dispositivo_nserie": "SN12345",
             "fechaA": "2023-02-01",
             "comentarios": "Initial assignment",
         },
         {
             "id": 2,
-            "user_rfc": "EFGH789012ABC",
+            "user_rfc": "janesmith",
             "dispositivo_nserie": "SN67890",
             "fechaA": "2023-03-15",
             "comentarios": "Loaner device",
@@ -32,25 +32,25 @@ class RAState(rx.State):
     ]
     users: list[User] = [
         {
-            "id": 1,
-            "rfc": "ABCD123456XYZ",
+            "userName": "johndoe",
             "name": "John Doe",
             "email": "john.doe@example.com",
-            "puesto": "Developer",
+            "contrasenna": "pass123",
+            "area": "Development",
         },
         {
-            "id": 2,
-            "rfc": "EFGH789012ABC",
+            "userName": "janesmith",
             "name": "Jane Smith",
             "email": "jane.smith@example.com",
-            "puesto": "Designer",
+            "contrasenna": "pass456",
+            "area": "Design",
         },
         {
-            "id": 3,
-            "rfc": "IJKL345678DEF",
+            "userName": "peterjones",
             "name": "Peter Jones",
             "email": "peter.jones@example.com",
-            "puesto": "Project Manager",
+            "contrasenna": "pass789",
+            "area": "Management",
         },
     ]
     computers: list[Computer] = [

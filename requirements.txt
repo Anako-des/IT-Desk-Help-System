@@ -1,2 +1,13 @@
 reflex==0.8.13a1
-pymysql
+pymysql>=1.1.2
+aiomysql>=0.2.0
+cryptography>=46
+geoalchemy2>=0.18
+aioodbc>=0.5.0
+pyodbc>=5.2.0
+supabase
+databricks-sql-connector[pyarrow]>=4
+databricks-sqlalchemy>=2
+databricks-sdk>=0.57
+asgiproxy>=0.2
+reflex-enterprise>=0.2

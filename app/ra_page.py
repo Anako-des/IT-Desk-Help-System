@@ -61,7 +61,9 @@ def add_ra_dialog() -> rx.Component:
             rx.dialog.title("Add New Assignment"),
             rx.dialog.description("Assign a device to a user."),
             rx.el.form(
-                form_select_field("User", "user_rfc", RAState.users, "rfc", "name"),
+                form_select_field(
+                    "User", "user_rfc", RAState.users, "userName", "name"
+                ),
                 form_select_field(
                     "Computer",
                     "dispositivo_nserie",
@@ -103,7 +105,7 @@ def edit_ra_dialog() -> rx.Component:
                     "User",
                     "user_rfc",
                     RAState.users,
-                    "rfc",
+                    "userName",
                     "name",
                     default_value=RAState.editing_ra["user_rfc"].to_string(),
                 ),
@@ -226,7 +228,7 @@ def ra_page_content() -> rx.Component:
                     class_name="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400",
                 ),
                 rx.el.input(
-                    placeholder="Search by User RFC, Device S/N, or comments...",
+                    placeholder="Search by Username, Device S/N, or comments...",
                     on_change=RAState.set_search_query,
                     class_name="pl-10 w-full bg-white border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#C00264]/50",
                 ),
@@ -238,7 +240,7 @@ def ra_page_content() -> rx.Component:
             rx.el.table(
                 rx.el.thead(
                     rx.el.tr(
-                        rx.el.th("User RFC", class_name="text-left font-medium p-3"),
+                        rx.el.th("Username", class_name="text-left font-medium p-3"),
                         rx.el.th("Device S/N", class_name="text-left font-medium p-3"),
                         rx.el.th(
                             "Assignment Date", class_name="text-left font-medium p-3"

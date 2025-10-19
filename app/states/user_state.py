@@ -3,35 +3,35 @@ from typing import TypedDict, Optional
 
 
 class User(TypedDict):
-    id: int
-    rfc: str
+    userName: str
     name: str
     email: str
-    puesto: str
+    contrasenna: str
+    area: str
 
 
 class UserState(rx.State):
     users: list[User] = [
         {
-            "id": 1,
-            "rfc": "ABCD123456XYZ",
+            "userName": "johndoe",
             "name": "John Doe",
             "email": "john.doe@example.com",
-            "puesto": "Developer",
+            "contrasenna": "pass123",
+            "area": "Development",
         },
         {
-            "id": 2,
-            "rfc": "EFGH789012ABC",
+            "userName": "janesmith",
             "name": "Jane Smith",
             "email": "jane.smith@example.com",
-            "puesto": "Designer",
+            "contrasenna": "pass456",
+            "area": "Design",
         },
         {
-            "id": 3,
-            "rfc": "IJKL345678DEF",
+            "userName": "peterjones",
             "name": "Peter Jones",
             "email": "peter.jones@example.com",
-            "puesto": "Project Manager",
+            "contrasenna": "pass789",
+            "area": "Management",
         },
     ]
     show_add_dialog: bool = False
@@ -40,7 +40,6 @@ class UserState(rx.State):
     editing_user: Optional[User] = None
     user_to_delete: Optional[User] = None
     search_query: str = ""
-    next_id: int = 4
 
     @rx.var
     def filtered_users(self) -> list[User]:
@@ -51,7 +50,7 @@ class UserState(rx.State):
             for u in self.users
             if self.search_query.lower() in u["name"].lower()
             or self.search_query.lower() in u["email"].lower()
-            or self.search_query.lower() in u["rfc"].lower()
+            or self.search_query.lower() in u["userName"].lower()
         ]
 
     @rx.event
@@ -69,14 +68,13 @@ class UserState(rx.State):
     @rx.event
     def add_user(self, form_data: dict):
         new_user = User(
-            id=self.next_id,
-            rfc=form_data["rfc"],
+            userName=form_data["userName"],
             name=form_data["name"],
             email=form_data["email"],
-            puesto=form_data["puesto"],
+            contrasenna=form_data["contrasenna"],
+            area=form_data["area"],
         )
         self.users.append(new_user)
-        self.next_id += 1
         return UserState.close_add_modal
 
     @rx.event
@@ -93,13 +91,15 @@ class UserState(rx.State):
     def update_user(self, form_data: dict):
         if self.editing_user is None:
             return
-        user_id = self.editing_user["id"]
+        username = self.editing_user["userName"]
         for i, user in enumerate(self.users):
-            if user["id"] == user_id:
-                self.users[i]["rfc"] = form_data["rfc"]
+            if user["userName"] == username:
+                self.users[i]["userName"] = form_data["userName"]
                 self.users[i]["name"] = form_data["name"]
                 self.users[i]["email"] = form_data["email"]
-                self.users[i]["puesto"] = form_data["puesto"]
+                self.users[i]["area"] = form_data["area"]
+                if form_data.get("contrasenna"):
+                    self.users[i]["contrasenna"] = form_data["contrasenna"]
                 break
         return UserState.close_edit_modal
 
@@ -111,7 +111,11 @@ class UserState(rx.State):
     @rx.event
     def delete_user(self):
         if self.user_to_delete:
-            self.users = [u for u in self.users if u["id"] != self.user_to_delete["id"]]
+            self.users = [
+                u
+                for u in self.users
+                if u["userName"] != self.user_to_delete["userName"]
+            ]
         return UserState.cancel_delete
 
     @rx.event
