@@ -36,11 +36,13 @@ def form_select_field(
     options: rx.Var[list],
     option_value_key: str,
     option_label_key: str,
+    placeholder: str,
     default_value: rx.Var[str] | str = "",
 ) -> rx.Component:
     return rx.el.div(
         rx.el.label(label, class_name="font-medium text-gray-700"),
         rx.el.select(
+            rx.el.option(placeholder, value="", disabled=True),
             rx.foreach(
                 options,
                 lambda option: rx.el.option(
@@ -62,7 +64,12 @@ def add_ra_dialog() -> rx.Component:
             rx.dialog.description("Assign a device to a user."),
             rx.el.form(
                 form_select_field(
-                    "User", "user_rfc", RAState.users, "userName", "name"
+                    "User",
+                    "user_rfc",
+                    RAState.users,
+                    "userName",
+                    "name",
+                    "Select a user",
                 ),
                 form_select_field(
                     "Computer",
@@ -70,6 +77,7 @@ def add_ra_dialog() -> rx.Component:
                     RAState.computers,
                     "nserie",
                     "name",
+                    "Select a computer",
                 ),
                 form_field("Comments", "comentarios", "Enter comments..."),
                 rx.el.div(
@@ -107,6 +115,7 @@ def edit_ra_dialog() -> rx.Component:
                     RAState.users,
                     "userName",
                     "name",
+                    "Select a user",
                     default_value=RAState.editing_ra["user_rfc"].to_string(),
                 ),
                 form_select_field(
@@ -115,6 +124,7 @@ def edit_ra_dialog() -> rx.Component:
                     RAState.computers,
                     "nserie",
                     "name",
+                    "Select a computer",
                     default_value=RAState.editing_ra["dispositivo_nserie"].to_string(),
                 ),
                 form_field(

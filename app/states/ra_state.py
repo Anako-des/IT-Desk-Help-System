@@ -1,8 +1,8 @@
 import reflex as rx
 from typing import TypedDict, Optional
 import datetime
-from app.states.user_state import User
-from app.states.computer_state import Computer
+from app.states.user_state import User, UserState
+from app.states.computer_state import Computer, ComputerState
 
 
 class RA(TypedDict):
@@ -86,8 +86,8 @@ class RAState(rx.State):
             "comentarios": "Teclado asignado a Sandra Vega.",
         },
     ]
-    users: list[User] = []
-    computers: list[Computer] = []
+    users: list[User] = UserState.users
+    computers: list[Computer] = ComputerState.computers
     show_add_dialog: bool = False
     show_edit_dialog: bool = False
     show_delete_alert: bool = False
@@ -129,11 +129,13 @@ class RAState(rx.State):
         """Adds a new RA record.
         SQL Query: INSERT INTO RA (user_rfc, dispositivo_nserie, fechaA, comentarios) VALUES (...);
         """
+        if "user_rfc" not in form_data or "dispositivo_nserie" not in form_data:
+            return rx.toast("Please select a user and a computer.", duration=3000)
         new_ra = RA(
             id=self.next_id,
             user_rfc=form_data["user_rfc"],
             dispositivo_nserie=form_data["dispositivo_nserie"],
-            comentarios=form_data["comentarios"],
+            comentarios=form_data.get("comentarios", ""),
             fechaA=datetime.date.today().isoformat(),
         )
         self.ras.append(new_ra)
@@ -157,12 +159,14 @@ class RAState(rx.State):
         """
         if self.editing_ra is None:
             return
+        if "user_rfc" not in form_data or "dispositivo_nserie" not in form_data:
+            return rx.toast("User and computer fields cannot be empty.", duration=3000)
         ra_id = self.editing_ra["id"]
         for i, ra in enumerate(self.ras):
             if ra["id"] == ra_id:
                 self.ras[i]["user_rfc"] = form_data["user_rfc"]
                 self.ras[i]["dispositivo_nserie"] = form_data["dispositivo_nserie"]
-                self.ras[i]["comentarios"] = form_data["comentarios"]
+                self.ras[i]["comentarios"] = form_data.get("comentarios", "")
                 break
         return RAState.close_edit_modal
 
