@@ -13,7 +13,98 @@ class Ticket(TypedDict):
 
 
 class TicketState(rx.State):
-    tickets: list[Ticket] = []
+    tickets: list[Ticket] = [
+        {
+            "id": 1,
+            "folio": "IT-RH-001",
+            "solicitante": "rhernandez",
+            "description": "Necesito instalar la suite de Adobe.",
+            "responsables": "rperez",
+            "status": "Working",
+            "fecha_creacion": "2024-10-01 09:30:00",
+        },
+        {
+            "id": 2,
+            "folio": "FIN-JT-002",
+            "solicitante": "jtorres",
+            "description": "No tengo acceso a la carpeta de Finanzas.",
+            "responsables": "rhernandez",
+            "status": "Finish",
+            "fecha_creacion": "2024-10-05 11:00:00",
+        },
+        {
+            "id": 3,
+            "folio": "IT-AP-003",
+            "solicitante": "rperez",
+            "description": "Problemas configurando el correo en mi celular.",
+            "responsables": "gbaez",
+            "status": "Hold",
+            "fecha_creacion": "2024-11-10 15:20:00",
+        },
+        {
+            "id": 4,
+            "folio": "RH-LR-004",
+            "solicitante": "lramirez",
+            "description": "La impresora de RH no imprime a color.",
+            "responsables": "rhernandez",
+            "status": "Working",
+            "fecha_creacion": "2024-11-15 10:00:00",
+        },
+        {
+            "id": 5,
+            "folio": "MKT-DC-005",
+            "solicitante": "dcastro",
+            "description": "Mi laptop no enciende.",
+            "responsables": "rperez",
+            "status": "Hold",
+            "fecha_creacion": "2024-12-01 08:45:00",
+        },
+        {
+            "id": 6,
+            "folio": "PRO-VR-006",
+            "solicitante": "vromero",
+            "description": "El equipo está muy lento, requiere mantenimiento.",
+            "responsables": "gbaez",
+            "status": "Finish",
+            "fecha_creacion": "2025-01-20 12:00:00",
+        },
+        {
+            "id": 7,
+            "folio": "VTA-FN-007",
+            "solicitante": "fnavarro",
+            "description": "Necesito la última actualización de Windows.",
+            "responsables": "rhernandez, rperez",
+            "status": "Working",
+            "fecha_creacion": "2025-02-15 14:00:00",
+        },
+        {
+            "id": 8,
+            "folio": "FIN-SV-008",
+            "solicitante": "svega",
+            "description": "Solicito respaldo de mi carpeta de Documentos.",
+            "responsables": "gbaez",
+            "status": "Finish",
+            "fecha_creacion": "2025-03-03 13:00:00",
+        },
+        {
+            "id": 9,
+            "folio": "IT-GB-009",
+            "solicitante": "gbaez",
+            "description": "Creo que tengo un virus, salen pop-ups.",
+            "responsables": "rhernandez, gbaez",
+            "status": "Hold",
+            "fecha_creacion": "2025-04-01 10:10:00",
+        },
+        {
+            "id": 10,
+            "folio": "VTA-ML-010",
+            "solicitante": "mlopez",
+            "description": "Necesito capacitación para usar el nuevo CRM.",
+            "responsables": "rperez",
+            "status": "Working",
+            "fecha_creacion": "2025-04-05 16:00:00",
+        },
+    ]
     show_edit_dialog: bool = False
     show_delete_alert: bool = False
     editing_ticket: Optional[Ticket] = None

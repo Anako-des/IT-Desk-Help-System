@@ -39,6 +39,7 @@ def add_computer_dialog() -> rx.Component:
                 form_field("Serial Number", "nserie", "Enter device's serial number"),
                 form_field("Name", "name", "Enter device name (e.g., Laptop Pro)"),
                 form_field("Brand", "marca", "Enter device brand"),
+                form_field("Type", "tipo", "Enter device type (e.g., Laptop)"),
                 rx.el.div(
                     rx.el.button(
                         "Cancel",
@@ -85,6 +86,12 @@ def edit_computer_dialog() -> rx.Component:
                     "marca",
                     "",
                     default_value=ComputerState.editing_computer["marca"].to_string(),
+                ),
+                form_field(
+                    "Type",
+                    "tipo",
+                    "",
+                    default_value=ComputerState.editing_computer["tipo"].to_string(),
                 ),
                 rx.el.div(
                     rx.el.button(
@@ -143,6 +150,7 @@ def computer_row(computer: Computer) -> rx.Component:
         rx.el.td(computer["nserie"], class_name="px-4 py-3 font-medium"),
         rx.el.td(computer["name"], class_name="px-4 py-3"),
         rx.el.td(computer["marca"], class_name="px-4 py-3"),
+        rx.el.td(computer["tipo"], class_name="px-4 py-3"),
         rx.el.td(computer["fechaS"], class_name="px-4 py-3"),
         rx.el.td(
             rx.el.div(
@@ -208,6 +216,7 @@ def computers_page_content() -> rx.Component:
                         ),
                         rx.el.th("Name", class_name="text-left font-medium p-3"),
                         rx.el.th("Brand", class_name="text-left font-medium p-3"),
+                        rx.el.th("Type", class_name="text-left font-medium p-3"),
                         rx.el.th(
                             "Acquisition Date", class_name="text-left font-medium p-3"
                         ),

@@ -17,65 +17,84 @@ class RAState(rx.State):
     ras: list[RA] = [
         {
             "id": 1,
-            "user_rfc": "johndoe",
-            "dispositivo_nserie": "SN12345",
-            "fechaA": "2023-02-01",
-            "comentarios": "Initial assignment",
+            "user_rfc": "rhernandez",
+            "dispositivo_nserie": "DELL-LAT-7420-01",
+            "fechaA": "2023-01-20",
+            "comentarios": "Equipo para líder de IT.",
         },
         {
             "id": 2,
-            "user_rfc": "janesmith",
-            "dispositivo_nserie": "SN67890",
+            "user_rfc": "rperez",
+            "dispositivo_nserie": "LEN-TP-X1C-03",
             "fechaA": "2023-03-15",
-            "comentarios": "Loaner device",
+            "comentarios": "Asignado a Ana Perez en IT.",
+        },
+        {
+            "id": 3,
+            "user_rfc": "gbaez",
+            "dispositivo_nserie": "HP-ED-800-02",
+            "fechaA": "2023-02-25",
+            "comentarios": "Estación de trabajo para Gerardo Baez.",
+        },
+        {
+            "id": 4,
+            "user_rfc": "mlopez",
+            "dispositivo_nserie": "AAPL-IP14-04",
+            "fechaA": "2023-04-10",
+            "comentarios": "Celular corporativo para el área de Ventas.",
+        },
+        {
+            "id": 5,
+            "user_rfc": "jtorres",
+            "dispositivo_nserie": "SAMS-ODY-G5-05",
+            "fechaA": "2023-05-15",
+            "comentarios": "Monitor adicional para estación de Finanzas.",
+        },
+        {
+            "id": 6,
+            "user_rfc": "lramirez",
+            "dispositivo_nserie": "BRO-HL-L2380-06",
+            "fechaA": "2023-06-20",
+            "comentarios": "Impresora asignada al departamento de RH.",
+        },
+        {
+            "id": 7,
+            "user_rfc": "dcastro",
+            "dispositivo_nserie": "DELL-XPS-15-07",
+            "fechaA": "2023-07-25",
+            "comentarios": "Equipo de alto rendimiento para Marketing.",
+        },
+        {
+            "id": 8,
+            "user_rfc": "vromero",
+            "dispositivo_nserie": "HP-SP-X360-08",
+            "fechaA": "2023-08-31",
+            "comentarios": "Laptop para Valeria Romero en Producción.",
+        },
+        {
+            "id": 9,
+            "user_rfc": "fnavarro",
+            "dispositivo_nserie": "LOGI-MXM3-09",
+            "fechaA": "2023-09-02",
+            "comentarios": "Periféricos para Fernando Navarro.",
+        },
+        {
+            "id": 10,
+            "user_rfc": "svega",
+            "dispositivo_nserie": "LOGI-MXK-10",
+            "fechaA": "2023-09-02",
+            "comentarios": "Teclado asignado a Sandra Vega.",
         },
     ]
-    users: list[User] = [
-        {
-            "userName": "johndoe",
-            "name": "John Doe",
-            "email": "john.doe@example.com",
-            "contrasenna": "pass123",
-            "area": "Development",
-        },
-        {
-            "userName": "janesmith",
-            "name": "Jane Smith",
-            "email": "jane.smith@example.com",
-            "contrasenna": "pass456",
-            "area": "Design",
-        },
-        {
-            "userName": "peterjones",
-            "name": "Peter Jones",
-            "email": "peter.jones@example.com",
-            "contrasenna": "pass789",
-            "area": "Management",
-        },
-    ]
-    computers: list[Computer] = [
-        {
-            "id": 1,
-            "nserie": "SN12345",
-            "name": "Laptop Pro",
-            "marca": "BrandA",
-            "fechaS": "2023-01-15",
-        },
-        {
-            "id": 2,
-            "nserie": "SN67890",
-            "name": "Desktop 5000",
-            "marca": "BrandB",
-            "fechaS": "2022-11-20",
-        },
-    ]
+    users: list[User] = []
+    computers: list[Computer] = []
     show_add_dialog: bool = False
     show_edit_dialog: bool = False
     show_delete_alert: bool = False
     editing_ra: Optional[RA] = None
     ra_to_delete: Optional[RA] = None
     search_query: str = ""
-    next_id: int = 3
+    next_id: int = 11
 
     @rx.var
     def filtered_ras(self) -> list[RA]:

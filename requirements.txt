@@ -11,3 +11,5 @@ databricks-sqlalchemy>=2
 databricks-sdk>=0.57
 asgiproxy>=0.2
 reflex-enterprise>=0.2
+linear-py
+reflex-okta-auth>=0.2.0a0

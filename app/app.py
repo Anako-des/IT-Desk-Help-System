@@ -4,6 +4,7 @@ from app.users_page import users_page_content
 from app.computers_page import computers_page_content
 from app.ra_page import ra_page_content
 from app.services_page import services_page_content
+from app.mantenimiento_page import mantenimiento_page_content
 
 
 def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
@@ -36,6 +37,7 @@ def sidebar() -> rx.Component:
                 sidebar_item("Computers", "laptop", "/computers"),
                 sidebar_item("RA", "file-text", "/ra"),
                 sidebar_item("Services", "settings", "/services"),
+                sidebar_item("Maintenance", "wrench", "/mantenimiento"),
                 sidebar_item("Ticket", "ticket", "#"),
                 class_name="grid items-start px-4 text-sm font-medium",
             ),
@@ -315,6 +317,14 @@ def services_page() -> rx.Component:
     )
 
 
+def mantenimiento_page() -> rx.Component:
+    return rx.el.div(
+        sidebar(),
+        mantenimiento_page_content(),
+        class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3]",
+    )
+
+
 app = rx.App(
     theme=rx.theme(appearance="light"),
     head_components=[
@@ -331,3 +341,4 @@ app.add_page(users_page, route="/users")
 app.add_page(computers_page, route="/computers")
 app.add_page(ra_page, route="/ra")
 app.add_page(services_page, route="/services")
+app.add_page(mantenimiento_page, route="/mantenimiento")

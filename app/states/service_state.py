@@ -6,28 +6,70 @@ class Service(TypedDict):
     id: int
     nombre: str
     caracteristicas: str
-    tipo_id: int
+    tipo: str
 
 
 class ServiceState(rx.State):
     services: list[Service] = [
         {
             "id": 1,
-            "nombre": "Software Installation",
-            "caracteristicas": "Installation of licensed software.",
-            "tipo_id": 2,
+            "nombre": "Instalación de Software",
+            "caracteristicas": "Instalación y configuración de aplicaciones de software.",
+            "tipo": "Software",
         },
         {
             "id": 2,
-            "nombre": "Hardware Repair",
-            "caracteristicas": "Repair of physical components.",
-            "tipo_id": 1,
+            "nombre": "Mantenimiento Preventivo",
+            "caracteristicas": "Limpieza y revisión de componentes de hardware.",
+            "tipo": "Hardware",
         },
         {
             "id": 3,
-            "nombre": "Network Configuration",
-            "caracteristicas": "Configuration of network settings and troubleshooting.",
-            "tipo_id": 3,
+            "nombre": "Soporte de Red",
+            "caracteristicas": "Resolución de problemas de conectividad a la red.",
+            "tipo": "Redes",
+        },
+        {
+            "id": 4,
+            "nombre": "Reparación de Hardware",
+            "caracteristicas": "Diagnóstico y reparación de componentes físicos.",
+            "tipo": "Hardware",
+        },
+        {
+            "id": 5,
+            "nombre": "Respaldo de Información",
+            "caracteristicas": "Creación de copias de seguridad de datos importantes.",
+            "tipo": "Datos",
+        },
+        {
+            "id": 6,
+            "nombre": "Configuración de Correo",
+            "caracteristicas": "Soporte para cuentas de correo electrónico.",
+            "tipo": "Software",
+        },
+        {
+            "id": 7,
+            "nombre": "Actualización de Sistema",
+            "caracteristicas": "Instalación de actualizaciones de sistema operativo.",
+            "tipo": "Software",
+        },
+        {
+            "id": 8,
+            "nombre": "Soporte para Impresoras",
+            "caracteristicas": "Resolución de problemas relacionados con impresoras.",
+            "tipo": "Hardware",
+        },
+        {
+            "id": 9,
+            "nombre": "Capacitación de Usuario",
+            "caracteristicas": "Entrenamiento sobre el uso de nuevo software o hardware.",
+            "tipo": "Capacitación",
+        },
+        {
+            "id": 10,
+            "nombre": "Gestión de Antivirus",
+            "caracteristicas": "Instalación y actualización de software de seguridad.",
+            "tipo": "Seguridad",
         },
     ]
     show_add_dialog: bool = False
@@ -36,7 +78,7 @@ class ServiceState(rx.State):
     editing_service: Optional[Service] = None
     service_to_delete: Optional[Service] = None
     search_query: str = ""
-    next_id: int = 4
+    next_id: int = 11
 
     @rx.var
     def filtered_services(self) -> list[Service]:
@@ -74,7 +116,7 @@ class ServiceState(rx.State):
             id=self.next_id,
             nombre=form_data["nombre"],
             caracteristicas=form_data["caracteristicas"],
-            tipo_id=int(form_data["tipo_id"]),
+            tipo=form_data["tipo"],
         )
         self.services.append(new_service)
         self.next_id += 1
@@ -102,7 +144,7 @@ class ServiceState(rx.State):
             if service["id"] == service_id:
                 self.services[i]["nombre"] = form_data["nombre"]
                 self.services[i]["caracteristicas"] = form_data["caracteristicas"]
-                self.services[i]["tipo_id"] = int(form_data["tipo_id"])
+                self.services[i]["tipo"] = form_data["tipo"]
                 break
         return ServiceState.close_edit_modal
 
