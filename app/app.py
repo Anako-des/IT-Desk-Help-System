@@ -66,14 +66,16 @@ def stat_card(
 def ticket_row(ticket: Ticket) -> rx.Component:
     return rx.el.tr(
         rx.el.td(ticket["folio"], class_name="px-4 py-3 font-medium"),
-        rx.el.td(ticket["solicitante"], class_name="px-4 py-3"),
-        rx.el.td(ticket["description"], class_name="px-4 py-3"),
-        rx.el.td(ticket["responsables"], class_name="px-4 py-3"),
+        rx.el.td(ticket["ra_id"], class_name="px-4 py-3"),
+        rx.el.td(ticket["servicio_id"], class_name="px-4 py-3"),
+        rx.el.td(ticket["descripcion"], class_name="px-4 py-3 max-w-xs truncate"),
+        rx.el.td(ticket["comentarios"], class_name="px-4 py-3 max-w-xs truncate"),
+        rx.el.td(ticket["fechaI"], class_name="px-4 py-3"),
         rx.el.td(
             rx.el.span(
-                ticket["status"],
+                ticket["estado"],
                 class_name=rx.match(
-                    ticket["status"],
+                    ticket["estado"],
                     (
                         "Hold",
                         "bg-gray-200 text-gray-800 px-2 py-1 rounded-full text-xs w-fit",
@@ -82,16 +84,21 @@ def ticket_row(ticket: Ticket) -> rx.Component:
                         "Working",
                         "bg-[#F25D07] bg-opacity-20 text-[#F25D07] px-2 py-1 rounded-full text-xs w-fit",
                     ),
-                    "bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs w-fit",
+                    (
+                        "Finish",
+                        "bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs w-fit",
+                    ),
+                    "bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs w-fit",
                 ),
             ),
             class_name="px-4 py-3",
         ),
+        rx.el.td(ticket["fechaF"], class_name="px-4 py-3"),
         rx.el.td(
             rx.el.div(
                 rx.el.button(
-                    rx.icon("pencil", class_name="w-4 h-4"),
-                    on_click=lambda: TicketState.show_edit_modal(ticket),
+                    rx.icon("eye", class_name="w-4 h-4"),
+                    on_click=lambda: TicketState.show_see_modal(ticket),
                     class_name="text-gray-600 hover:text-gray-900",
                 ),
                 rx.el.button(
@@ -142,10 +149,13 @@ def tickets_table() -> rx.Component:
                 rx.el.thead(
                     rx.el.tr(
                         rx.el.th("Folio", class_name="text-left font-medium p-3"),
-                        rx.el.th("Requester", class_name="text-left font-medium p-3"),
+                        rx.el.th("RA ID", class_name="text-left font-medium p-3"),
+                        rx.el.th("Service ID", class_name="text-left font-medium p-3"),
                         rx.el.th("Description", class_name="text-left font-medium p-3"),
-                        rx.el.th("Responsible", class_name="text-left font-medium p-3"),
+                        rx.el.th("Comments", class_name="text-left font-medium p-3"),
+                        rx.el.th("Start Date", class_name="text-left font-medium p-3"),
                         rx.el.th("Status", class_name="text-left font-medium p-3"),
+                        rx.el.th("End Date", class_name="text-left font-medium p-3"),
                         rx.el.th("Actions", class_name="text-left font-medium p-3"),
                         class_name="border-b bg-gray-50",
                     )
@@ -153,53 +163,58 @@ def tickets_table() -> rx.Component:
                 rx.el.tbody(rx.foreach(TicketState.filtered_tickets, ticket_row)),
                 class_name="w-full text-sm",
             ),
-            class_name="border rounded-lg overflow-hidden bg-white",
+            class_name="border rounded-lg overflow-x-auto bg-white",
         ),
     )
 
 
-def edit_ticket_dialog() -> rx.Component:
+def see_ticket_details(label: str, value: rx.Var[str]) -> rx.Component:
+    return rx.el.div(
+        rx.el.p(label, class_name="font-semibold text-gray-600"),
+        rx.el.p(value, class_name="text-gray-800"),
+        class_name="mb-3",
+    )
+
+
+def see_ticket_dialog() -> rx.Component:
     return rx.dialog.root(
         rx.dialog.content(
-            rx.dialog.title("Edit Ticket"),
-            rx.dialog.description("Update the ticket information below."),
-            rx.el.form(
-                rx.el.div(
-                    rx.el.label("Description", class_name="font-medium"),
-                    rx.el.input(
-                        name="description",
-                        default_value=TicketState.editing_ticket["description"].to(str),
-                        class_name="w-full mt-1 p-2 border rounded",
-                    ),
-                    class_name="mb-4",
+            rx.dialog.title("Ticket Details"),
+            rx.dialog.description("Viewing ticket details."),
+            rx.el.div(
+                see_ticket_details(
+                    "Folio", TicketState.ticket_to_see["folio"].to_string()
                 ),
-                rx.el.div(
-                    rx.el.label("Status", class_name="font-medium"),
-                    rx.el.select(
-                        rx.el.option("Hold", value="Hold"),
-                        rx.el.option("Working", value="Working"),
-                        rx.el.option("Finish", value="Finish"),
-                        name="status",
-                        default_value=TicketState.editing_ticket["status"].to(str),
-                        class_name="w-full mt-1 p-2 border rounded bg-white",
-                    ),
-                    class_name="mb-6",
+                see_ticket_details(
+                    "RA ID", TicketState.ticket_to_see["ra_id"].to_string()
                 ),
-                rx.el.div(
-                    rx.el.button(
-                        "Cancel",
-                        on_click=TicketState.close_edit_modal,
-                        type="button",
-                        class_name="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300",
-                    ),
-                    rx.el.button(
-                        "Save Changes",
-                        type="submit",
-                        class_name="px-4 py-2 rounded bg-[#C00264] text-white hover:bg-[#B2419B]",
-                    ),
-                    class_name="flex justify-end gap-3",
+                see_ticket_details(
+                    "Service ID", TicketState.ticket_to_see["servicio_id"].to_string()
                 ),
-                on_submit=TicketState.update_ticket,
+                see_ticket_details(
+                    "Description", TicketState.ticket_to_see["descripcion"].to_string()
+                ),
+                see_ticket_details(
+                    "Comments", TicketState.ticket_to_see["comentarios"].to_string()
+                ),
+                see_ticket_details(
+                    "Start Date", TicketState.ticket_to_see["fechaI"].to_string()
+                ),
+                see_ticket_details(
+                    "Status", TicketState.ticket_to_see["estado"].to_string()
+                ),
+                see_ticket_details(
+                    "End Date", TicketState.ticket_to_see["fechaF"].to_string()
+                ),
+                class_name="mt-4",
+            ),
+            rx.el.div(
+                rx.el.button(
+                    "Close",
+                    on_click=TicketState.close_see_modal,
+                    class_name="mt-4 px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300",
+                ),
+                class_name="flex justify-end",
             ),
             style={
                 "position": "fixed",
@@ -211,10 +226,10 @@ def edit_ticket_dialog() -> rx.Component:
                 "borderRadius": "1rem",
                 "boxShadow": "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                 "width": "90vw",
-                "maxWidth": "500px",
+                "maxWidth": "600px",
             },
         ),
-        open=TicketState.show_edit_dialog,
+        open=TicketState.show_see_dialog,
     )
 
 
@@ -279,7 +294,6 @@ def index() -> rx.Component:
     return rx.el.div(
         sidebar(),
         dashboard(),
-        edit_ticket_dialog(),
         delete_ticket_alert(),
         class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3]",
     )
@@ -328,10 +342,13 @@ def mantenimiento_page() -> rx.Component:
 def tickets_page() -> rx.Component:
     return rx.el.div(
         sidebar(),
-        tickets_table(),
-        edit_ticket_dialog(),
-        delete_ticket_alert(),
-        class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3] p-6",
+        rx.el.div(
+            tickets_table(),
+            see_ticket_dialog(),
+            delete_ticket_alert(),
+            class_name="p-6",
+        ),
+        class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3]",
     )
 
 
