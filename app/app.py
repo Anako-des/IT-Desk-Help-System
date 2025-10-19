@@ -64,7 +64,9 @@ def stat_card(
 def ticket_row(ticket: Ticket) -> rx.Component:
     return rx.el.tr(
         rx.el.td(ticket["folio"], class_name="px-4 py-3 font-medium"),
+        rx.el.td(ticket["solicitante"], class_name="px-4 py-3"),
         rx.el.td(ticket["description"], class_name="px-4 py-3"),
+        rx.el.td(ticket["responsables"], class_name="px-4 py-3"),
         rx.el.td(
             rx.el.span(
                 ticket["status"],
@@ -110,11 +112,11 @@ def search_filter_bar() -> rx.Component:
                 class_name="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400",
             ),
             rx.el.input(
-                placeholder="Search by folio...",
+                placeholder="Search by folio, requester, or responsible...",
                 on_change=TicketState.set_search_query,
                 class_name="pl-10 w-full bg-white border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#C00264]/50",
             ),
-            class_name="relative w-full max-w-sm",
+            class_name="relative w-full max-w-md",
         ),
         rx.el.select(
             rx.el.option("All Statuses", value="all"),
@@ -138,7 +140,9 @@ def tickets_table() -> rx.Component:
                 rx.el.thead(
                     rx.el.tr(
                         rx.el.th("Folio", class_name="text-left font-medium p-3"),
+                        rx.el.th("Requester", class_name="text-left font-medium p-3"),
                         rx.el.th("Description", class_name="text-left font-medium p-3"),
+                        rx.el.th("Responsible", class_name="text-left font-medium p-3"),
                         rx.el.th("Status", class_name="text-left font-medium p-3"),
                         rx.el.th("Actions", class_name="text-left font-medium p-3"),
                         class_name="border-b bg-gray-50",

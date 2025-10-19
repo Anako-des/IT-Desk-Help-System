@@ -5,55 +5,15 @@ from typing import TypedDict, Optional
 class Ticket(TypedDict):
     id: int
     folio: str
+    solicitante: Optional[str]
     description: str
+    responsables: str
     status: str
+    fecha_creacion: str
 
 
 class TicketState(rx.State):
-    tickets: list[Ticket] = [
-        {
-            "id": 1,
-            "folio": "T2024-001",
-            "description": "Printer not working",
-            "status": "Hold",
-        },
-        {
-            "id": 2,
-            "folio": "T2024-002",
-            "description": "Cannot connect to WiFi",
-            "status": "Working",
-        },
-        {
-            "id": 3,
-            "folio": "T2024-003",
-            "description": "Software installation request",
-            "status": "Hold",
-        },
-        {
-            "id": 4,
-            "folio": "T2024-004",
-            "description": "Email configuration issue",
-            "status": "Finish",
-        },
-        {
-            "id": 5,
-            "folio": "T2024-005",
-            "description": "Password reset",
-            "status": "Working",
-        },
-        {
-            "id": 6,
-            "folio": "T2024-006",
-            "description": "Blue screen error",
-            "status": "Finish",
-        },
-        {
-            "id": 7,
-            "folio": "T2024-007",
-            "description": "Request for a new mouse",
-            "status": "Hold",
-        },
-    ]
+    tickets: list[Ticket] = []
     show_edit_dialog: bool = False
     show_delete_alert: bool = False
     editing_ticket: Optional[Ticket] = None
@@ -121,8 +81,13 @@ class TicketState(rx.State):
         if self.status_filter != "all":
             tickets = [t for t in tickets if t["status"] == self.status_filter]
         if self.search_query:
+            query = self.search_query.lower()
             tickets = [
-                t for t in tickets if self.search_query.lower() in t["folio"].lower()
+                t
+                for t in tickets
+                if query in t["folio"].lower()
+                or (t["solicitante"] and query in t["solicitante"].lower())
+                or query in t["responsables"].lower()
             ]
         return tickets
 
