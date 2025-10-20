@@ -41,7 +41,6 @@ def sidebar() -> rx.Component:
                 sidebar_item("Services", "settings", "/services"),
                 sidebar_item("Maintenance", "wrench", "/mantenimiento"),
                 sidebar_item("Create Ticket", "ticket-plus", "/create-ticket"),
-                sidebar_item("Dashboard", "layout-dashboard", "/"),
                 sidebar_item("View Tickets", "eye", "/view-tickets"),
                 class_name="grid items-start px-4 text-sm font-medium",
             ),
@@ -169,10 +168,28 @@ def edit_ticket_dialog() -> rx.Component:
             rx.dialog.description("Update the ticket information below."),
             rx.el.form(
                 rx.el.div(
-                    rx.el.label("Description", class_name="font-medium"),
-                    rx.el.input(
-                        name="description",
-                        default_value=TicketState.editing_ticket["description"].to(str),
+                    rx.el.label("Responsible", class_name="font-medium"),
+                    rx.el.select(
+                        rx.el.option("Select a user", value="", disabled=True),
+                        rx.foreach(
+                            TicketState.it_users,
+                            lambda user: rx.el.option(
+                                user["name"], value=user["userName"]
+                            ),
+                        ),
+                        name="responsables",
+                        default_value=TicketState.editing_ticket["responsables"].to(
+                            str
+                        ),
+                        class_name="w-full mt-1 p-2 border rounded bg-white",
+                    ),
+                    class_name="mb-4",
+                ),
+                rx.el.div(
+                    rx.el.label("Comments", class_name="font-medium"),
+                    rx.el.textarea(
+                        name="comentarios",
+                        default_value=TicketState.editing_ticket["comentarios"].to(str),
                         class_name="w-full mt-1 p-2 border rounded",
                     ),
                     class_name="mb-4",
@@ -366,6 +383,8 @@ app.add_page(computers_page, route="/computers")
 app.add_page(ra_page, route="/ra")
 app.add_page(services_page, route="/services")
 app.add_page(mantenimiento_page, route="/mantenimiento")
-app.add_page(create_ticket_page, route="/create-ticket")
+app.add_page(
+    create_ticket_page, route="/create-ticket", on_load=CreateTicketState.on_load
+)
 app.add_page(tickets_page, route="/tickets")
 app.add_page(view_tickets_page, route="/view-tickets")

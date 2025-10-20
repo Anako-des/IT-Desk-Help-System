@@ -1,8 +1,8 @@
 import reflex as rx
 from typing import TypedDict, Optional
 import datetime
-from app.states.user_state import User, UserState
-from app.states.computer_state import Computer, ComputerState
+from app.states.user_state import User
+from app.states.computer_state import Computer
 
 
 class RA(TypedDict):
@@ -86,8 +86,8 @@ class RAState(rx.State):
             "comentarios": "Teclado asignado a Sandra Vega.",
         },
     ]
-    users: list[User] = UserState.users
-    computers: list[Computer] = ComputerState.computers
+    users: list[User] = []
+    computers: list[Computer] = []
     show_add_dialog: bool = False
     show_edit_dialog: bool = False
     show_delete_alert: bool = False
@@ -96,12 +96,18 @@ class RAState(rx.State):
     search_query: str = ""
     next_id: int = 11
 
+    @rx.event
+    async def on_load(self):
+        from app.states.user_state import UserState
+        from app.states.computer_state import ComputerState
+
+        user_state = await self.get_state(UserState)
+        computer_state = await self.get_state(ComputerState)
+        self.users = user_state.users
+        self.computers = computer_state.computers
+
     @rx.var
     def filtered_ras(self) -> list[RA]:
-        """This computed var filters the RA list based on the search query.
-        In a database-backed app, this filtering would happen in the SQL query.
-        SQL Query (example): SELECT * FROM RA WHERE user_rfc LIKE '%query%' OR dispositivo_nserie LIKE '%query%'
-        """
         if not self.search_query:
             return self.ras
         return [
@@ -117,7 +123,8 @@ class RAState(rx.State):
         self.search_query = query
 
     @rx.event
-    def show_add_modal(self):
+    async def show_add_modal(self):
+        await self.on_load()
         self.show_add_dialog = True
 
     @rx.event
@@ -126,9 +133,6 @@ class RAState(rx.State):
 
     @rx.event
     def add_ra(self, form_data: dict):
-        """Adds a new RA record.
-        SQL Query: INSERT INTO RA (user_rfc, dispositivo_nserie, fechaA, comentarios) VALUES (...);
-        """
         if not form_data.get("user_rfc") or not form_data.get("dispositivo_nserie"):
             return rx.toast.error("Please select a user and a computer.")
         new_ra = RA(
@@ -143,7 +147,8 @@ class RAState(rx.State):
         return RAState.close_add_modal
 
     @rx.event
-    def show_edit_modal(self, ra: RA):
+    async def show_edit_modal(self, ra: RA):
+        await self.on_load()
         self.editing_ra = ra
         self.show_edit_dialog = True
 
@@ -154,9 +159,6 @@ class RAState(rx.State):
 
     @rx.event
     def update_ra(self, form_data: dict):
-        """Updates an existing RA record.
-        SQL Query: UPDATE RA SET user_rfc = ..., dispositivo_nserie = ..., comentarios = ... WHERE ID = ...;
-        """
         if self.editing_ra is None:
             return
         if not form_data.get("user_rfc") or not form_data.get("dispositivo_nserie"):
@@ -177,9 +179,6 @@ class RAState(rx.State):
 
     @rx.event
     def delete_ra(self):
-        """Deletes an RA record.
-        SQL Query: DELETE FROM RA WHERE ID = ...;
-        """
         if self.ra_to_delete:
             self.ras = [r for r in self.ras if r["id"] != self.ra_to_delete["id"]]
         return RAState.cancel_delete

@@ -275,4 +275,5 @@ def ra_page_content() -> rx.Component:
         edit_ra_dialog(),
         delete_ra_alert(),
         class_name="flex-1 p-6 space-y-6 bg-[#EAEFF3]",
+        on_mount=RAState.on_load,
     )

@@ -177,6 +177,15 @@ class TicketState(rx.State):
     ticket_to_delete: Optional[Ticket] = None
     search_query: str = ""
     status_filter: str = "all"
+    it_users: list[dict] = []
+    next_ticket_id: int = 11
+
+    @rx.event
+    async def on_load_it_users(self):
+        from app.states.user_state import UserState
+
+        user_state = await self.get_state(UserState)
+        self.it_users = [u for u in user_state.users if u["area"] == "IT"]
 
     @rx.event
     def set_search_query(self, query: str):
@@ -187,7 +196,8 @@ class TicketState(rx.State):
         self.status_filter = status
 
     @rx.event
-    def show_edit_modal(self, ticket: Ticket):
+    async def show_edit_modal(self, ticket: Ticket):
+        await self.on_load_it_users()
         self.editing_ticket = ticket
         self.show_edit_dialog = True
 
@@ -203,7 +213,8 @@ class TicketState(rx.State):
         ticket_id = self.editing_ticket["id"]
         for i, ticket in enumerate(self.tickets):
             if ticket["id"] == ticket_id:
-                self.tickets[i]["description"] = form_data["description"]
+                self.tickets[i]["responsables"] = form_data["responsables"]
+                self.tickets[i]["comentarios"] = form_data["comentarios"]
                 self.tickets[i]["status"] = form_data["status"]
                 break
         yield TicketState.close_edit_modal
