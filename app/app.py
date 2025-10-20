@@ -1,10 +1,12 @@
 import reflex as rx
 from app.states.ticket_state import TicketState, Ticket
+from app.states.create_ticket_state import CreateTicketState
 from app.users_page import users_page_content
 from app.computers_page import computers_page_content
 from app.ra_page import ra_page_content
 from app.services_page import services_page_content
 from app.mantenimiento_page import mantenimiento_page_content
+from app.view_tickets_page import view_tickets_page
 
 
 def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
@@ -38,7 +40,9 @@ def sidebar() -> rx.Component:
                 sidebar_item("RA", "file-text", "/ra"),
                 sidebar_item("Services", "settings", "/services"),
                 sidebar_item("Maintenance", "wrench", "/mantenimiento"),
-                sidebar_item("Ticket", "ticket", "/tickets"),
+                sidebar_item("Create Ticket", "ticket-plus", "/create-ticket"),
+                sidebar_item("Dashboard", "layout-dashboard", "/"),
+                sidebar_item("View Tickets", "eye", "/view-tickets"),
                 class_name="grid items-start px-4 text-sm font-medium",
             ),
             class_name="flex-1 overflow-auto py-2",
@@ -335,6 +339,16 @@ def tickets_page() -> rx.Component:
     )
 
 
+def create_ticket_page() -> rx.Component:
+    from app.create_ticket_page import create_ticket_form
+
+    return rx.el.div(
+        sidebar(),
+        create_ticket_form(),
+        class_name="grid min-h-screen w-full lg:grid-cols-[280px_1fr] font-['Inter'] bg-[#EAEFF3]",
+    )
+
+
 app = rx.App(
     theme=rx.theme(appearance="light"),
     head_components=[
@@ -352,4 +366,6 @@ app.add_page(computers_page, route="/computers")
 app.add_page(ra_page, route="/ra")
 app.add_page(services_page, route="/services")
 app.add_page(mantenimiento_page, route="/mantenimiento")
+app.add_page(create_ticket_page, route="/create-ticket")
 app.add_page(tickets_page, route="/tickets")
+app.add_page(view_tickets_page, route="/view-tickets")

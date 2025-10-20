@@ -10,6 +10,12 @@ class Ticket(TypedDict):
     responsables: str
     status: str
     fecha_creacion: str
+    ra_id: int
+    servicio_id: int
+    comentarios: str
+    foto: Optional[str]
+    fechaI: str
+    fechaF: Optional[str]
 
 
 class TicketState(rx.State):
@@ -22,6 +28,12 @@ class TicketState(rx.State):
             "responsables": "rperez",
             "status": "Working",
             "fecha_creacion": "2024-10-01 09:30:00",
+            "ra_id": 1,
+            "servicio_id": 1,
+            "comentarios": "Se requiere licencia.",
+            "foto": "uploads/adobe.png",
+            "fechaI": "2024-10-01 09:30:00",
+            "fechaF": None,
         },
         {
             "id": 2,
@@ -31,6 +43,12 @@ class TicketState(rx.State):
             "responsables": "rhernandez",
             "status": "Finish",
             "fecha_creacion": "2024-10-05 11:00:00",
+            "ra_id": 5,
+            "servicio_id": 3,
+            "comentarios": "Permisos asignados.",
+            "foto": None,
+            "fechaI": "2024-10-05 11:00:00",
+            "fechaF": "2024-10-05 12:00:00",
         },
         {
             "id": 3,
@@ -40,6 +58,12 @@ class TicketState(rx.State):
             "responsables": "gbaez",
             "status": "Hold",
             "fecha_creacion": "2024-11-10 15:20:00",
+            "ra_id": 2,
+            "servicio_id": 6,
+            "comentarios": "Pendiente de validación de usuario.",
+            "foto": None,
+            "fechaI": "2024-11-10 15:20:00",
+            "fechaF": None,
         },
         {
             "id": 4,
@@ -49,6 +73,12 @@ class TicketState(rx.State):
             "responsables": "rhernandez",
             "status": "Working",
             "fecha_creacion": "2024-11-15 10:00:00",
+            "ra_id": 6,
+            "servicio_id": 8,
+            "comentarios": "Revisando niveles de tinta.",
+            "foto": "uploads/impresora.jpg",
+            "fechaI": "2024-11-15 10:00:00",
+            "fechaF": None,
         },
         {
             "id": 5,
@@ -58,6 +88,12 @@ class TicketState(rx.State):
             "responsables": "rperez",
             "status": "Hold",
             "fecha_creacion": "2024-12-01 08:45:00",
+            "ra_id": 7,
+            "servicio_id": 4,
+            "comentarios": "Posible fallo de hardware.",
+            "foto": None,
+            "fechaI": "2024-12-01 08:45:00",
+            "fechaF": None,
         },
         {
             "id": 6,
@@ -67,6 +103,12 @@ class TicketState(rx.State):
             "responsables": "gbaez",
             "status": "Finish",
             "fecha_creacion": "2025-01-20 12:00:00",
+            "ra_id": 8,
+            "servicio_id": 2,
+            "comentarios": "Se realizó limpieza y optimización.",
+            "foto": None,
+            "fechaI": "2025-01-20 12:00:00",
+            "fechaF": "2025-01-21 14:00:00",
         },
         {
             "id": 7,
@@ -76,6 +118,12 @@ class TicketState(rx.State):
             "responsables": "rhernandez, rperez",
             "status": "Working",
             "fecha_creacion": "2025-02-15 14:00:00",
+            "ra_id": 9,
+            "servicio_id": 7,
+            "comentarios": "Descargando actualizaciones.",
+            "foto": None,
+            "fechaI": "2025-02-15 14:00:00",
+            "fechaF": None,
         },
         {
             "id": 8,
@@ -85,6 +133,12 @@ class TicketState(rx.State):
             "responsables": "gbaez",
             "status": "Finish",
             "fecha_creacion": "2025-03-03 13:00:00",
+            "ra_id": 10,
+            "servicio_id": 5,
+            "comentarios": "Respaldo completado en la nube.",
+            "foto": "uploads/backup.zip",
+            "fechaI": "2025-03-03 13:00:00",
+            "fechaF": "2025-03-03 15:30:00",
         },
         {
             "id": 9,
@@ -94,6 +148,12 @@ class TicketState(rx.State):
             "responsables": "rhernandez, gbaez",
             "status": "Hold",
             "fecha_creacion": "2025-04-01 10:10:00",
+            "ra_id": 3,
+            "servicio_id": 10,
+            "comentarios": "Análisis de seguridad en curso.",
+            "foto": None,
+            "fechaI": "2025-04-01 10:10:00",
+            "fechaF": None,
         },
         {
             "id": 10,
@@ -103,6 +163,12 @@ class TicketState(rx.State):
             "responsables": "rperez",
             "status": "Working",
             "fecha_creacion": "2025-04-05 16:00:00",
+            "ra_id": 4,
+            "servicio_id": 9,
+            "comentarios": "Sesión programada para el viernes.",
+            "foto": None,
+            "fechaI": "2025-04-05 16:00:00",
+            "fechaF": None,
         },
     ]
     show_edit_dialog: bool = False

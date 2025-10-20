@@ -129,8 +129,8 @@ class RAState(rx.State):
         """Adds a new RA record.
         SQL Query: INSERT INTO RA (user_rfc, dispositivo_nserie, fechaA, comentarios) VALUES (...);
         """
-        if "user_rfc" not in form_data or "dispositivo_nserie" not in form_data:
-            return rx.toast("Please select a user and a computer.", duration=3000)
+        if not form_data.get("user_rfc") or not form_data.get("dispositivo_nserie"):
+            return rx.toast.error("Please select a user and a computer.")
         new_ra = RA(
             id=self.next_id,
             user_rfc=form_data["user_rfc"],
@@ -159,8 +159,8 @@ class RAState(rx.State):
         """
         if self.editing_ra is None:
             return
-        if "user_rfc" not in form_data or "dispositivo_nserie" not in form_data:
-            return rx.toast("User and computer fields cannot be empty.", duration=3000)
+        if not form_data.get("user_rfc") or not form_data.get("dispositivo_nserie"):
+            return rx.toast.error("User and computer fields cannot be empty.")
         ra_id = self.editing_ra["id"]
         for i, ra in enumerate(self.ras):
             if ra["id"] == ra_id:
